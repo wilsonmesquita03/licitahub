@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String // Hash
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  costItems       CostItem[]
+  createdTenders  Tender[]   @relation("CreatedTenders")
+  followedTenders Tender[]   @relation("FollowedTenders")
+}
+
+model Tender {
+  id                    String   @id @default(cuid())
+  purchaseNumber        String
+  process               String
+  purchaseYear          Int
+  purchaseSequence      Int
+  modalityId            Int
+  modalityName          String
+  instrumentTypeName    String
+  purchaseStatusId      Int
+  purchaseStatusName    String
+  purchaseObject        String
+  estimatedTotalValue   Int
+  approvedTotalValue    Int?
+  inclusionDate         DateTime
+  publicationDatePncp   DateTime
+  updateDate            DateTime
+  proposalOpeningDate   DateTime
+  proposalClosingDate   DateTime
+  pncpControlNumber     String   @unique
+  globalUpdateDate      DateTime
+  disputeModeId         Int
+  disputeModeName       String
+  srp                   Boolean
+  userName              String?
+  sourceSystemLink      String?
+  electronicProcessLink String?
+
+  orgaoEntidadeId String
+  orgaoEntidade   OrgaoEntidade @relation(fields: [orgaoEntidadeId], references: [id])
+
+  unidadeOrgaoId String
+  unidadeOrgao   UnidadeOrgao @relation(fields: [unidadeOrgaoId], references: [id])
+
+  amparoLegalId String
+  amparoLegal   AmparoLegal @relation(fields: [amparoLegalId], references: [id])
+
+  costItems CostItem[]
+
+  createdBy User?   @relation("CreatedTenders", fields: [creatorId], references: [id])
+  creatorId String?
+
+  followedBy User[] @relation("FollowedTenders")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrgaoEntidade {
+  id          String @id @default(cuid())
+  cnpj        String @unique
+  companyName String
+  powerId     String
+  sphereId    String
+
+  tenders Tender[]
+}
+
+model UnidadeOrgao {
+  id        String @id @default(cuid())
+  unitCode  String @unique
+  unitName  String
+  cityName  String
+  stateAbbr String
+  stateName String
+  ibgeCode  String
+
+  tenders Tender[]
+}
+
+model AmparoLegal {
+  id          String @id @default(cuid())
+  code        Int    @unique
+  name        String
+  description String
+
+  tenders Tender[]
+}
+
+model CostItem {
+  id          String   @id @default(uuid())
+  description String
+  category    Category
+  value       Float
+  type        CostType
+  tenderId    String
+  tender      Tender   @relation(fields: [tenderId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum CostType {
+  FIXED
+  VARIABLE
+}
+
+enum Category {
+  MATERIAL
+  SERVICO
+  TRANSPORTE
+  TRIBUTOS
+  OUTROS
+}
