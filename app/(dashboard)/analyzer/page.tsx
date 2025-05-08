@@ -69,7 +69,7 @@ export default function AnalyzerPage() {
 
             {file && (
               <div className="flex items-center gap-2">
-                <p className="text-sm">Arquivo selecionado: {file.name}</p>
+                <p className="text-sm">Arquivo selecionado: {file?.name}</p>
               </div>
             )}
 
@@ -104,7 +104,7 @@ export default function AnalyzerPage() {
           <CardContent>
             <div 
               className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: analysisResult }}
+              dangerouslySetInnerHTML={{ __html: analysisResult || "" }}
             />
           </CardContent>
         </Card>
