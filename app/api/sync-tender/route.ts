@@ -9,6 +9,11 @@ export async function GET(request: NextRequest) {
   const dataLimite = new Date(hoje);
   dataLimite.setDate(hoje.getDate() + 7); // Adiciona 7 dias ao dia atual
 
+  const dataLimiteFormatada = dataLimite
+    .toISOString()
+    .split("T")[0]
+    .replace(/-/g, ""); // Remove os hífens
+
   const modalidades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]; // Modalidades de 1 a 13
 
   // Faz uma requisição para cada modalidade
@@ -23,7 +28,7 @@ export async function GET(request: NextRequest) {
         data: Compra[];
       }>("https://pncp.gov.br/api/consulta/v1/contratacoes/proposta", {
         params: {
-          dataFinal: dataLimite.toISOString().split("T")[0], // Data limite como ISO (apenas a parte da data)
+          dataFinal: dataLimiteFormatada, // Data limite como ISO (apenas a parte da data)
           codigoModalidadeContratacao: modalidade, // Modalidade específica
           pagina,
           tamanhoPagina: 50,
