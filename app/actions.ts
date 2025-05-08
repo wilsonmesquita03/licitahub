@@ -6,8 +6,7 @@ import { OpenAI } from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
-export async function analyzePdf(prevState: any, formData: FormData) {
-  const file = formData.get("file") as File;
+export async function analyzePdf(file: File) {
   if (!file) throw new Error("Arquivo não encontrado");
 
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -21,32 +20,83 @@ export async function analyzePdf(prevState: any, formData: FormData) {
   const assistant = await openai.beta.assistants.create({
     name: "Analista de Editais",
     instructions: `
-      Analise o arquivo PDF de licitação fornecido e extraia os pontos mais importantes, como:
-      - Objetivo da licitação
-      - Requisitos principais
-      - Prazo de execução
-      - Valor estimado
-      - Critérios de julgamento
-      - Documentação exigida
-      - Instruções importantes
-      - Outras informações relevantes para o processo licitatório.
-      
-      Forneça a resposta no formato HTML, utilizando tags como <h1>, <h2>, <ul>, <li> estilizando com classes padrão tailwindcss (espaçamentos, listas seja criativo) para organizar e estruturar o conteúdo.
-      A resposta deve ser objetiva e precisa, com foco nas informações solicitadas, sem adição de interpretações ou dados irrelevantes.
-    `,
+  Você é um analista sênior de licitações públicas, especializado na interpretação estratégica de editais à luz da Lei nº 14.133/2021. Seu único foco é apoiar empresas privadas na análise objetiva e acionável de editais públicos.
+  
+  📌 OBJETIVO
+  Gerar relatórios claros, técnicos e estruturados em HTML, prontos para orientar a tomada de decisão da empresa — com destaque para riscos, prazos, exigências e oportunidades.
+  
+  📄 FORMATO DA RESPOSTA
+  - Exclusivamente em HTML válido e estruturado;
+  - Pode utilizar Tailwind CSS para estilização, **mas sem alterar o background padrão**;
+  - Sem comentários, explicações ou saídas fora da marcação HTML.
+  
+  📋 INCLUIR NA INTRODUÇÃO:
+  - Objeto da licitação;
+  - Órgão responsável;
+  - Local de execução (Estado ou Município);
+  - Modalidade (presencial ou online);
+  - Portal da disputa;
+  - Valor estimado;
+  - Prazos: vigência da contratação, vigência da execução e prazo de execução;
+  - Critério de julgamento (ex: menor preço por item);
+  - Exigência de atestado de capacidade técnica;
+  - Exigência de certidões e/ou credenciamento.
+  
+  🧾 DETALHAR OS BLOCOS ABAIXO (nesta ordem):
+  1. ✅ Checklist de Documentos Obrigatórios
+     - Habilitação Jurídica
+     - Regularidade Fiscal
+     - Qualificação Técnica
+     - Qualificação Econômico-Financeira
+     - Declarações obrigatórias
+  
+  2. ⏰ Prazos e Datas Relevantes
+     - Data limite para envio de propostas
+     - Data da sessão pública
+     - Prazos para impugnação e esclarecimentos
+  
+  3. ⚠️ Cláusulas Críticas e Riscos à Participação
+     - Exigências incomuns ou desproporcionais
+     - Condições que possam limitar a competitividade
+     - Pontos com potencial de inabilitação
+  
+  4. ❗ Recomendações Estratégicas
+     - Sugestões práticas para aumentar a chance de sucesso
+     - Fundamentação legal (Lei nº 14.133/2021) para impugnações, se cabível
+  
+  5. 🔍 Observações Finais
+     - Ambiguidades, lacunas ou riscos contratuais
+     - Destaques sobre sanções, garantias, critérios ou omissões relevantes
+  
+  ⚖️ FUNDAMENTO LEGAL
+  Você possui acesso à íntegra da Lei nº 14.133/2021 e deve usá-la sempre que necessário:
+  - Para interpretar cláusulas;
+  - Identificar abusos ou ilegalidades;
+  - Apontar omissões e sugerir impugnações fundamentadas (ex: “Art. 65, §1º”).
+  
+  🔐 INSTRUÇÕES FINAIS
+  - Use linguagem técnica, clara e objetiva;
+  - Nunca cole trechos brutos do edital;
+  - Sempre cite o artigo correspondente da Lei nº 14.133/2021 ao apontar algo juridicamente relevante;
+  - A resposta final deve ser HTML puro e funcional, com Tailwind CSS se necessário — sem conteúdo fora da tag <html>.
+  `,
     tools: [
       {
         type: "file_search",
       },
     ],
     model: "gpt-4o-mini",
+    response_format: {
+      type: "text",
+    },
   });
 
   const thread = await openai.beta.threads.create();
 
   await openai.beta.threads.messages.create(thread.id, {
     role: "user",
-    content: "Leia o edital e gere um checklist...",
+    content:
+      "Analise o PDF de licitação e forneça APENAS o conteúdo HTML, com os dados reais preenchidos. Não use placeholders.",
     attachments: [
       {
         file_id: uploaded.id,
@@ -60,28 +110,32 @@ export async function analyzePdf(prevState: any, formData: FormData) {
   });
 
   let status = run.status;
+
   while (["queued", "in_progress", "cancelling"].includes(status)) {
+    console.log("Status do run:", status);
     await new Promise((r) => setTimeout(r, 2000));
     const updated = await openai.beta.threads.runs.retrieve(thread.id, run.id);
     status = updated.status;
-    if (status === "completed") {
-      const messages = await openai.beta.threads.messages.list(thread.id);
-      const text = messages.data.find((m) => m.role === "assistant")
-        ?.content[0];
-
-      if (text?.type === "text") {
-        // Remove o "```html" e a marcação de código (se houver)
-        const cleanedText = text.text.value.replace(/```html|```/g, "").trim();
-
-        // Retorna o conteúdo limpo que pode ser utilizado no innerHTML
-        return { message: cleanedText };
-      }
-
-      throw new Error("Resposta inesperada da IA");
-    }
   }
 
-  throw new Error("Execução não concluída");
+  // Fora do loop:
+  if (status === "completed") {
+    const messages = await openai.beta.threads.messages.list(thread.id);
+    const text = messages.data.find((m) => m.role === "assistant")?.content[0];
+
+    if (!text) {
+      throw new Error("Resposta da IA vazia");
+    }
+
+    if (text?.type === "text") {
+      const cleanedText = text.text.value.replace(/```html|```/g, "").trim();
+      return { message: cleanedText };
+    }
+
+    throw new Error("Resposta inesperada da IA");
+  }
+
+  throw new Error(`Execução falhou com status: ${status}`);
 }
 
 export async function getCosts(file: File): Promise<{ costs: CostItem[] }> {
@@ -184,6 +238,4 @@ export async function getCosts(file: File): Promise<{ costs: CostItem[] }> {
   throw new Error("Execução não concluída");
 }
 
-export async function analizeEdital(){
-
-}
+export async function analizeEdital() {}

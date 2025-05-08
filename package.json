@@ -5,11 +5,14 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate --no-engine",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@dicebear/avatars": "^4.10.8",
+    "@dicebear/collection": "^9.2.2",
+    "@dicebear/core": "^9.2.2",
     "@hookform/resolvers": "^3.9.0",
     "@next/swc-wasm-nodejs": "13.5.1",
     "@prisma/client": "^6.7.0",
@@ -56,6 +59,7 @@
     "eslint-config-next": "15.3.1",
     "file-type": "^20.5.0",
     "formdata-node": "^6.0.3",
+    "framer-motion": "^12.10.4",
     "input-otp": "^1.2.4",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.446.0",

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -17,12 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <>
       <Header />
       <SidebarProvider>
         <AppSidebar />
@@ -34,6 +28,6 @@ export default function RootLayout({
         </main>
       </SidebarProvider>
       <Toaster />
-    </ThemeProvider>
+    </>
   );
 }

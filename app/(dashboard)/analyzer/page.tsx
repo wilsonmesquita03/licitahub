@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { analyzePdf } from '@/app/actions';
 
 export default function AnalyzerPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -29,24 +30,17 @@ export default function AnalyzerPage() {
 
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const { message }  = await analyzePdf(file)
 
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error('Análise falhou');
-
-      const result = await response.text();
-      setAnalysisResult(result);
+      setAnalysisResult(message);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
     } finally {
       setIsLoading(false);
     }
   };
+
+  return <></>
 
   return (
     <div className="container mx-auto p-4 space-y-6">
