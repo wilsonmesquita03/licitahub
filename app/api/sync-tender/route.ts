@@ -1,87 +1,89 @@
-import { prisma } from "@/lib/prisma";
-import { capitalizarTexto } from "@/lib/utils";
-import { Compra } from "@/types/pncp";
-import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
+import axios from "axios";
+import { prisma } from "@/lib/prisma";
+import { Compra } from "@/types/pncp";
+import { capitalizarTexto } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   const hoje = new Date();
   const dataLimite = new Date(hoje);
-  dataLimite.setDate(hoje.getDate() + 7); // Adiciona 7 dias ao dia atual
+  dataLimite.setDate(hoje.getDate() + 7);
 
   const dataLimiteFormatada = dataLimite
     .toISOString()
     .split("T")[0]
-    .replace(/-/g, ""); // Remove os hífens
+    .replace(/-/g, "");
+  const modalidades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
-  const modalidades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]; // Modalidades de 1 a 13
-
-  // Faz uma requisição para cada modalidade
   for (const modalidade of modalidades) {
     let pagina = 1;
     let totalPaginas = 1;
 
     while (pagina <= totalPaginas) {
-      // Faz a requisição para buscar as licitações da página atual e da modalidade específica
       const { data: tendersResponse } = await axios.get<{
         totalPaginas: number;
         data: Compra[];
       }>("https://pncp.gov.br/api/consulta/v1/contratacoes/proposta", {
         params: {
-          dataFinal: dataLimiteFormatada, // Data limite como ISO (apenas a parte da data)
-          codigoModalidadeContratacao: modalidade, // Modalidade específica
+          dataFinal: dataLimiteFormatada,
+          codigoModalidadeContratacao: modalidade,
           pagina,
           tamanhoPagina: 50,
         },
       });
 
-      const tenders = tendersResponse.data;
+      const tenders = Array(tendersResponse.data) as unknown as Compra[];
       totalPaginas = tendersResponse.totalPaginas;
 
       for (const tender of tenders) {
+        if(!tender?.numeroControlePNCP) {
+          continue;
+        }
+
         const unidade = tender.unidadeOrgao;
         const orgao = tender.orgaoEntidade;
         const amparo = tender.amparoLegal;
 
-        const municipioNomeCapitalizado = capitalizarTexto(
-          unidade.municipioNome
-        );
-        const nomeOrgaoCapitalizado = capitalizarTexto(orgao.razaoSocial);
-        const nomeUnidadeCapitalizado = capitalizarTexto(unidade.nomeUnidade);
+        // Verificações de existência
+        if (unidade) {
+          await prisma.unidadeOrgao.upsert({
+            where: { unitCode: unidade.codigoUnidade },
+            update: {},
+            create: {
+              unitCode: unidade.codigoUnidade,
+              unitName: capitalizarTexto(unidade.nomeUnidade),
+              cityName: capitalizarTexto(unidade.municipioNome),
+              stateName: unidade.ufNome,
+              stateAbbr: unidade.ufSigla,
+              ibgeCode: unidade.codigoIbge,
+            },
+          });
+        }
 
-        await prisma.unidadeOrgao.upsert({
-          where: { unitCode: unidade.codigoUnidade },
-          update: {},
-          create: {
-            unitCode: unidade.codigoUnidade,
-            unitName: nomeUnidadeCapitalizado,
-            cityName: municipioNomeCapitalizado,
-            stateName: unidade.ufNome,
-            stateAbbr: unidade.ufSigla,
-            ibgeCode: unidade.codigoIbge,
-          },
-        });
+        if (orgao) {
+          await prisma.orgaoEntidade.upsert({
+            where: { cnpj: orgao.cnpj },
+            update: {},
+            create: {
+              cnpj: orgao.cnpj,
+              companyName: capitalizarTexto(orgao.razaoSocial),
+              powerId: orgao.poderId,
+              sphereId: orgao.esferaId,
+            },
+          });
+        }
 
-        await prisma.orgaoEntidade.upsert({
-          where: { cnpj: orgao.cnpj },
-          update: {},
-          create: {
-            cnpj: orgao.cnpj,
-            companyName: nomeOrgaoCapitalizado,
-            powerId: orgao.poderId,
-            sphereId: orgao.esferaId,
-          },
-        });
-
-        await prisma.amparoLegal.upsert({
-          where: { code: amparo.codigo },
-          update: {},
-          create: {
-            code: amparo.codigo,
-            name: amparo.nome,
-            description: amparo.descricao,
-          },
-        });
+        if (amparo) {
+          await prisma.amparoLegal.upsert({
+            where: { code: amparo.codigo },
+            update: {},
+            create: {
+              code: amparo.codigo,
+              name: amparo.nome,
+              description: amparo.descricao,
+            },
+          });
+        }
 
         await prisma.tender.upsert({
           where: { pncpControlNumber: tender.numeroControlePNCP },
@@ -112,15 +114,17 @@ export async function GET(request: NextRequest) {
             userName: tender.usuarioNome,
             sourceSystemLink: tender.linkSistemaOrigem,
             electronicProcessLink: tender.linkProcessoEletronico,
-            // Foreign Keys
-            orgaoEntidade: { connect: { cnpj: orgao.cnpj } },
-            unidadeOrgao: { connect: { unitCode: unidade.codigoUnidade } },
-            amparoLegal: { connect: { code: amparo.codigo } },
+            ...(orgao && { orgaoEntidade: { connect: { cnpj: orgao.cnpj } } }),
+            ...(unidade && {
+              unidadeOrgao: { connect: { unitCode: unidade.codigoUnidade } },
+            }),
+            ...(amparo && {
+              amparoLegal: { connect: { code: amparo.codigo } },
+            }),
           },
         });
       }
 
-      // Incrementa a página para buscar os próximos resultados
       pagina++;
     }
   }
