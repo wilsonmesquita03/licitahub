@@ -4,7 +4,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2, Copy, FileDown, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,23 +30,28 @@ export default function PropostasPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [proposal, setProposal] = useState<string | null>(null);
   const { toast } = useToast();
-  
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProposalForm>();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProposalForm>();
 
   const onSubmit = async (data: ProposalForm) => {
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/montarProposta', {
-        method: 'POST',
+      const response = await fetch("/api/montarProposta", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Falha ao gerar proposta');
+        throw new Error(error.message || "Falha ao gerar proposta");
       }
 
       const result = await response.json();
@@ -48,7 +59,9 @@ export default function PropostasPage() {
     } catch (error: any) {
       toast({
         title: "Erro",
-        description: error.message || "Não foi possível gerar a proposta. Tente novamente.",
+        description:
+          error.message ||
+          "Não foi possível gerar a proposta. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -68,10 +81,10 @@ export default function PropostasPage() {
 
   const handleExportPDF = () => {
     if (proposal) {
-      const element = document.createElement('a');
-      const file = new Blob([proposal], { type: 'application/pdf' });
+      const element = document.createElement("a");
+      const file = new Blob([proposal], { type: "application/pdf" });
       element.href = URL.createObjectURL(file);
-      element.download = 'proposta.pdf';
+      element.download = "proposta.pdf";
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
@@ -114,10 +127,7 @@ export default function PropostasPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="cnpj">CNPJ</Label>
-                  <Input
-                    id="cnpj"
-                    {...register("cnpj", { required: true })}
-                  />
+                  <Input id="cnpj" {...register("cnpj", { required: true })} />
                 </div>
 
                 <div className="space-y-2">
@@ -148,14 +158,13 @@ export default function PropostasPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="observacoes">Observações Adicionais</Label>
-                  <Textarea
-                    id="observacoes"
-                    {...register("observacoes")}
-                  />
+                  <Textarea id="observacoes" {...register("observacoes")} />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="conteudoEdital">Conteúdo do Edital (opcional)</Label>
+                  <Label htmlFor="conteudoEdital">
+                    Conteúdo do Edital (opcional)
+                  </Label>
                   <Textarea
                     id="conteudoEdital"
                     {...register("conteudoEdital")}
@@ -165,18 +174,13 @@ export default function PropostasPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button
-                    type="submit"
-                    disabled={isGenerating}
-                  >
-                    {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Button type="submit" disabled={isGenerating}>
+                    {isGenerating && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Gerar Proposta
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleReset}
-                  >
+                  <Button type="button" variant="outline" onClick={handleReset}>
                     <X className="mr-2 h-4 w-4" />
                     Limpar
                   </Button>
@@ -201,7 +205,7 @@ export default function PropostasPage() {
               ) : proposal ? (
                 <>
                   <div className="prose prose-sm max-w-none mb-4 max-h-[500px] overflow-y-auto p-4 border rounded-lg">
-                    <div style={{ whiteSpace: 'pre-wrap' }}>{proposal}</div>
+                    <div style={{ whiteSpace: "pre-wrap" }}>{proposal}</div>
                   </div>
                   <div className="flex gap-4">
                     <Button onClick={handleCopy}>
@@ -212,11 +216,7 @@ export default function PropostasPage() {
                       <FileDown className="mr-2 h-4 w-4" />
                       Exportar PDF
                     </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => onSubmit(handleSubmit((data) => data)())}
-                      disabled={isGenerating}
-                    >
+                    <Button variant="outline" disabled={isGenerating}>
                       <RefreshCw className="mr-2 h-4 w-4" />
                       Gerar Nova Versão
                     </Button>
@@ -224,7 +224,7 @@ export default function PropostasPage() {
                 </>
               ) : (
                 <div className="flex items-center justify-center h-64 text-muted-foreground">
-                  Preencha o formulário e clique em "Gerar Proposta"
+                  Preencha o formulário e clique em &quot;Gerar Proposta&quot;
                 </div>
               )}
             </CardContent>

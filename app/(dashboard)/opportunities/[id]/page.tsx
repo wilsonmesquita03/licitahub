@@ -4,9 +4,9 @@ import { TenderDetails } from "@/components/tender-details";
 import { prisma } from "@/lib/prisma";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 async function getTender(id: string) {
@@ -22,7 +22,7 @@ async function getTender(id: string) {
     },
   });
 
-  return tender
+  return tender;
 }
 
 export default async function TenderPage({ params }: PageProps) {

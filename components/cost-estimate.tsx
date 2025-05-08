@@ -62,7 +62,6 @@ export function CostEstimate({ tender }: CostEstimateProps) {
     try {
       const result = await getCosts(file); // chama a IA
       if (result?.costs?.length) {
-        setCosts((prev) => [...prev, ...result.costs]);
       }
     } catch (err) {
       console.error("Erro ao extrair custos:", err);
