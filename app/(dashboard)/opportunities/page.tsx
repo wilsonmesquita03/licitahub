@@ -6,10 +6,10 @@ import { PaginationControls } from "@/components/pagination-controls";
 export default async function RadarPage({
   searchParams,
 }: {
-  searchParams?: { page?: string; limit?: string };
+  searchParams?: Promise<{ page?: string; limit?: string }>;
 }) {
-  const currentPage = Number(searchParams?.page) || 1;
-  const limit = Number(searchParams?.limit) || 50;
+  const currentPage = Number((await searchParams)?.page) || 1;
+  const limit = Number((await searchParams)?.limit) || 50;
 
   const tenders = await prisma.tender.findMany({
     skip: (currentPage - 1) * limit,
