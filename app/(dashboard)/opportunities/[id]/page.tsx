@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { mockTenders } from "@/data/mock-tenders";
 import { TenderDetails } from "@/components/tender-details";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
+import { Prisma } from "@prisma/client";
 
 interface PageProps {
   params: Promise<{
@@ -12,14 +13,16 @@ interface PageProps {
 async function getTender(id: string) {
   "use server";
 
+  const include: Prisma.TenderInclude = {
+    unidadeOrgao: true,
+    orgaoEntidade: true,
+  };
+
   const tender = await prisma.tender.findUnique({
     where: {
       id,
     },
-    include: {
-      unidadeOrgao: true,
-      orgaoEntidade: true,
-    },
+    include,
   });
 
   return tender;

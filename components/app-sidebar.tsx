@@ -57,7 +57,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="mt-[61px] h-[calc(100%-61px)]">
-      <SidebarContent className="bg-black">
+      <SidebarContent className="dark:bg-black">
         <SidebarGroup>
           <SidebarGroupLabel>Menu lateral</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -76,7 +76,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="bg-black">
+      <SidebarFooter className="dark:bg-black">
         {session.user && (
           <SidebarContent>
             <SidebarGroup>

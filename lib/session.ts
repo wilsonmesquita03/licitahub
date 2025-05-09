@@ -35,6 +35,16 @@ export async function getSession(): Promise<Session> {
       where: {
         id: decoded.sub,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        followedTenders: {
+          select: {
+            id: true,
+          },
+        },
+      },
     });
 
     if (!user)
@@ -45,11 +55,7 @@ export async function getSession(): Promise<Session> {
 
     return {
       status: "authenticated",
-      user: {
-        id: user.id,
-        name: user.name || "",
-        email: user.email,
-      },
+      user,
     };
   } catch (error) {
     console.error("Erro ao verificar token:", error);

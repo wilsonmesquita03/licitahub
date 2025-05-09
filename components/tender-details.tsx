@@ -4,17 +4,12 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Star,
-  StarIcon,
-  ArrowLeft,
-  FileText,
-  Clock,
-  Landmark,
-} from "lucide-react";
+import { Star, StarIcon, ArrowLeft, FileText, Clock } from "lucide-react";
 import Link from "next/link";
 import { CostEstimate } from "./cost-estimate";
 import { Tender, UnidadeOrgao, OrgaoEntidade } from "@prisma/client";
+import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
+import { useSession } from "@/app/session-provider";
 
 interface TenderDetailsProps {
   tender: Tender & {
@@ -24,7 +19,10 @@ interface TenderDetailsProps {
 }
 
 export function TenderDetails({ tender }: TenderDetailsProps) {
-  const [isFollowed, setIsFollowed] = useState(false);
+  const { user } = useSession();
+  const [isFollowed, setIsFollowed] = useState(
+    !!user?.followedTenders.find((t) => t.id === tender.id)
+  );
 
   const statusColors = {
     "Divulgada no PNCP": "bg-green-500",
@@ -32,7 +30,10 @@ export function TenderDetails({ tender }: TenderDetailsProps) {
     Suspensa: "bg-red-500",
   };
 
-  const toggleFollow = () => setIsFollowed(!isFollowed);
+  const toggleFollow = async () => {
+    toggleFollowAction(tender.id, isFollowed);
+    setIsFollowed(!isFollowed);
+  };
 
   return (
     <div className="space-y-6">

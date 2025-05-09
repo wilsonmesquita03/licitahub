@@ -3,7 +3,12 @@
 import { createContext, useContext, ReactNode } from "react";
 
 export interface SessionAuthenticated {
-  user: { id: string; name: string; email: string };
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    followedTenders: { id: string }[];
+  };
   status: "authenticated";
 }
 

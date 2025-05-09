@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Star, StarIcon } from "lucide-react";
 import Link from "next/link";
 import { Tender } from "@prisma/client";
+import { useSession } from "@/app/session-provider";
+import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
 
 interface TenderCardProps {
   tender: Tender & {
@@ -21,8 +23,14 @@ interface TenderCardProps {
 }
 
 export function TenderCard({ tender }: TenderCardProps) {
-  const [isFollowed, setIsFollowed] = useState(false);
-  const toggleFollow = () => setIsFollowed(!isFollowed);
+  const { user } = useSession();
+  const [isFollowed, setIsFollowed] = useState(
+    user ? !!user.followedTenders.find((t) => t.id === tender.id) : false
+  );
+  const toggleFollow = () => {
+    toggleFollowAction(tender.id, isFollowed);
+    setIsFollowed(!isFollowed);
+  };
 
   const statusColors = {
     "Divulgada no PNCP": "bg-green-500",
@@ -53,6 +61,7 @@ export function TenderCard({ tender }: TenderCardProps) {
               toggleFollow();
             }}
             aria-label={isFollowed ? "Deixar de seguir" : "Seguir licitação"}
+            className="flex-shrink-0"
           >
             {isFollowed ? (
               <StarIcon className="h-5 w-5 text-yellow-500 fill-current" />

@@ -9,15 +9,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import {
-  Bell,
-  Building2,
-  FileSearch,
-  FileText,
-  LayoutDashboard,
-  Search,
-} from "lucide-react";
-import Link from "next/link";
+import { Bell, FileSearch, FileText, Search } from "lucide-react";
 
 export default function Dashboard() {
   return (
