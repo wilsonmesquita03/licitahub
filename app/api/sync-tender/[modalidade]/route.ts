@@ -35,10 +35,7 @@ export async function GET(
       const elapsed = Date.now() - start;
       const remaining = maxExecutionTime - elapsed;
 
-      console.log(remaining);
-
-      // Se restam menos de 20 segundos, para aqui
-      if (remaining < 10_000) {
+      if (remaining < 20_000) {
         return NextResponse.json({
           success: false,
           message: "Tempo quase esgotado, processo interrompido com segurança.",
