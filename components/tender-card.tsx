@@ -33,7 +33,7 @@ export function TenderCard({ tender }: TenderCardProps) {
   };
 
   return (
-    <Link href={`/opportunities/${tender.id}`}>
+    <Link href={`/opportunities/${tender.id}`} prefetch={false}>
       <Card className="p-4 flex flex-col justify-between hover:shadow-lg transition-shadow h-full">
         <div className="flex justify-between items-start mb-4">
           <div>
