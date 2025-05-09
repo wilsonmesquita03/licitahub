@@ -8,9 +8,12 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ modalidade: string }> }
 ) {
-  const hoje = new Date();
-  const dataLimite = new Date(hoje);
-  dataLimite.setDate(hoje.getDate() + 7);
+  const start = Date.now(); // tempo inicial
+  const maxExecutionTime = 1000 * 60 * 55; // 55 segundos, por segurança
+
+  const now = new Date();
+  const dataLimite = new Date(now);
+  dataLimite.setDate(now.getDate() + 7);
 
   const dataLimiteFormatada = dataLimite
     .toISOString()
@@ -23,6 +26,19 @@ export async function GET(
     let totalPaginas = 1;
 
     while (pagina <= totalPaginas) {
+      const elapsed = Date.now() - start;
+      const remaining = maxExecutionTime - elapsed;
+
+      // Se restam menos de 20 segundos, para aqui
+      if (remaining < 20_000) {
+        return NextResponse.json({
+          success: false,
+          message: "Tempo quase esgotado, processo interrompido com segurança.",
+          currentPage: pagina,
+          modalidade,
+        });
+      }
+
       const { data: tendersResponse } = await axios.get<{
         totalPaginas: number;
         data: Compra[];
@@ -35,19 +51,18 @@ export async function GET(
         },
       });
 
-      const tenders = Array(tendersResponse.data) as unknown as Compra[];
+      const tenders = Array.isArray(tendersResponse.data)
+        ? tendersResponse.data
+        : [tendersResponse.data];
       totalPaginas = tendersResponse.totalPaginas;
 
       for (const tender of tenders) {
-        if (!tender?.numeroControlePNCP) {
-          continue;
-        }
+        if (!tender?.numeroControlePNCP) continue;
 
         const unidade = tender.unidadeOrgao;
         const orgao = tender.orgaoEntidade;
         const amparo = tender.amparoLegal;
 
-        // Verificações de existência
         if (unidade) {
           await prisma.unidadeOrgao.upsert({
             where: { unitCode: unidade.codigoUnidade },
