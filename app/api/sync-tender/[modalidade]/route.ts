@@ -6,7 +6,7 @@ import { capitalizarTexto } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
-  params: Promise<{ modalidade: string }>
+  { params }: { params: Promise<{ modalidade: string }> }
 ) {
   const hoje = new Date();
   const dataLimite = new Date(hoje);
