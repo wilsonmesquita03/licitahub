@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ modalidade: string }> }
 ) {
   const start = Date.now(); // tempo inicial
-  const maxExecutionTime = 1000 * 60 * 55; // 55 segundos, por segurança
+  const maxExecutionTime = 60_000
 
   const now = new Date();
   const dataLimite = new Date(now);
@@ -29,8 +29,10 @@ export async function GET(
       const elapsed = Date.now() - start;
       const remaining = maxExecutionTime - elapsed;
 
+      console.log(remaining)
+
       // Se restam menos de 20 segundos, para aqui
-      if (remaining < 20_000) {
+      if (remaining < 5_000) {
         return NextResponse.json({
           success: false,
           message: "Tempo quase esgotado, processo interrompido com segurança.",
