@@ -28,7 +28,7 @@ export async function GET(
   const modalidades = (await params).modalidade;
 
   for (const modalidade of modalidades) {
-    let pagina = Number((await searchParams)?.page) || 1;
+    let pagina = Number(request.nextUrl.searchParams.get("page")) || 1;
     let totalPaginas = 1;
 
     while (pagina <= totalPaginas) {
