@@ -67,7 +67,9 @@ export function TenderDetails({ tender }: TenderDetailsProps) {
               ]
             } text-white`}
           >
-            {tender.purchaseStatusName.replace("_", " ")}
+            {tender.purchaseStatusName === "Divulgada no PNCP"
+              ? "Aberto"
+              : tender.purchaseStatusName}
           </Badge>
         </div>
 
@@ -170,7 +172,9 @@ export function TenderDetails({ tender }: TenderDetailsProps) {
             <Button>Enviar Proposta</Button>
           </Link>
         ) : (
-          <Button className="cursor-not-allowed" disabled>Enviar Proposta (Link Indisponível)</Button>
+          <Button className="cursor-not-allowed" disabled>
+            Enviar Proposta (Link Indisponível)
+          </Button>
         )}
       </div>
     </div>

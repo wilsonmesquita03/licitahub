@@ -29,7 +29,7 @@ export function TenderCard({ tender }: TenderCardProps) {
     "Em Andamento": "bg-yellow-500",
     Fechado: "bg-red-500",
     Cancelado: "bg-gray-500",
-    "Suspensa": "bg-red-500",
+    Suspensa: "bg-red-500",
   };
 
   return (
@@ -81,7 +81,9 @@ export function TenderCard({ tender }: TenderCardProps) {
                 ] || "bg-gray-500"
               }
             >
-              {tender.purchaseStatusName}
+              {tender.purchaseStatusName === "Divulgada no PNCP"
+                ? "Aberto"
+                : tender.purchaseStatusName}
             </Badge>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">
