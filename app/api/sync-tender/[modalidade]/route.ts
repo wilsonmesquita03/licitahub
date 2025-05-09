@@ -45,6 +45,7 @@ export async function GET(
     }
 
     const { data: tendersResponse } = await axios.get<{
+      empty: boolean;
       totalPaginas: number;
       data: Compra[];
     }>("https://pncp.gov.br/api/consulta/v1/contratacoes/proposta", {
@@ -55,6 +56,15 @@ export async function GET(
         tamanhoPagina: 50,
       },
     });
+
+    if (tendersResponse.empty) {
+      return NextResponse.json({
+        success: true,
+        message: "Nenhuma proposta encontrada.",
+        currentPage: pagina,
+        modalidade,
+      });
+    }
 
     const tenders = Array.isArray(tendersResponse.data)
       ? tendersResponse.data
