@@ -38,7 +38,7 @@ export async function GET(
       console.log(remaining);
 
       // Se restam menos de 20 segundos, para aqui
-      if (remaining < 5_000) {
+      if (remaining < 10_000) {
         return NextResponse.json({
           success: false,
           message: "Tempo quase esgotado, processo interrompido com segurança.",
