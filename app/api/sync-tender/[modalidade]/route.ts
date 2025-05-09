@@ -6,10 +6,16 @@ import { capitalizarTexto } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ modalidade: string }> }
+  {
+    params,
+    searchParams,
+  }: {
+    params: Promise<{ modalidade: string; page?: string }>;
+    searchParams?: Promise<{ page?: string }>;
+  }
 ) {
   const start = Date.now(); // tempo inicial
-  const maxExecutionTime = 60_000
+  const maxExecutionTime = 60_000;
 
   const now = new Date();
   const dataLimite = new Date(now);
@@ -22,14 +28,14 @@ export async function GET(
   const modalidades = (await params).modalidade;
 
   for (const modalidade of modalidades) {
-    let pagina = 1;
+    let pagina = Number((await searchParams)?.page) || 1;
     let totalPaginas = 1;
 
     while (pagina <= totalPaginas) {
       const elapsed = Date.now() - start;
       const remaining = maxExecutionTime - elapsed;
 
-      console.log(remaining)
+      console.log(remaining);
 
       // Se restam menos de 20 segundos, para aqui
       if (remaining < 5_000) {
