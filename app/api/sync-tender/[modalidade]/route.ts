@@ -4,7 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { Compra } from "@/types/pncp";
 import { capitalizarTexto } from "@/lib/utils";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  params: Promise<{ modalidade: string }>
+) {
   const hoje = new Date();
   const dataLimite = new Date(hoje);
   dataLimite.setDate(hoje.getDate() + 7);
@@ -13,7 +16,7 @@ export async function GET(request: NextRequest) {
     .toISOString()
     .split("T")[0]
     .replace(/-/g, "");
-  const modalidades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+  const modalidades = (await params).modalidade;
 
   for (const modalidade of modalidades) {
     let pagina = 1;
@@ -36,7 +39,7 @@ export async function GET(request: NextRequest) {
       totalPaginas = tendersResponse.totalPaginas;
 
       for (const tender of tenders) {
-        if(!tender?.numeroControlePNCP) {
+        if (!tender?.numeroControlePNCP) {
           continue;
         }
 

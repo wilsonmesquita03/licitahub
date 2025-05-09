@@ -1,9 +1,0 @@
-{
-    "crons": [
-      {
-        "path": "/api/sync-tender",
-        "schedule": "0 12 * * *"
-      }
-    ]
-  }
-  
