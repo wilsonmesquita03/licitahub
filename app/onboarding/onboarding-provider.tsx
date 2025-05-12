@@ -7,7 +7,7 @@ type OnboardingStep = {
   title: string;
 };
 
-type OnboardingFormData = {
+export type OnboardingFormData = {
   companyName: string;
   cnpj: string;
   productServiceDescription: string;

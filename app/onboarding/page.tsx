@@ -16,9 +16,14 @@ import { CompanyInfoStep } from "./components/company-info-step";
 import { ProductServiceStep } from "./components/product-service-step";
 import { ReviewStep } from "./components/review-step";
 import { WelcomeStep } from "./components/welcome-step";
+import { finishOnboard } from "./action";
 
 export default function OnboardingPage() {
-  const { currentStep, steps, nextStep, prevStep } = useOnboarding();
+  const { currentStep, steps, nextStep, prevStep, formData } = useOnboarding();
+
+  const handleSubmit = async () => {
+    await finishOnboard(formData)
+  };
 
   // No arquivo page.tsx, atualize o switch case:
   const getCurrentStepComponent = () => {
@@ -65,7 +70,11 @@ export default function OnboardingPage() {
               Voltar
             </Button>
 
-            <Button onClick={nextStep}>
+            <Button
+              onClick={
+                currentStep === steps.length - 1 ? handleSubmit : nextStep
+              }
+            >
               {currentStep === steps.length - 1 ? "Finalizar" : "Próximo"}
             </Button>
           </CardFooter>

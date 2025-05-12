@@ -1,6 +1,9 @@
 "use server";
 
+import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 import { CostItem } from "@prisma/client";
+import { redirect } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { OpenAI } from "openai";
 
@@ -8,87 +11,22 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export async function analyzePdf(file: File) {
   if (!file) throw new Error("Arquivo não encontrado");
+  const session = await getSession();
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const blob = new Blob([buffer], { type: "application/pdf" });
+  if (!session.user) throw new Error("Usuário não autenticado");
 
-  const uploaded = await openai.files.create({
-    file: new File([blob], file.name, { type: "application/pdf" }),
-    purpose: "assistants",
+  const assistant = await prisma.assistant.findFirst({
+    where: {
+      userId: session.user.id,
+      name: "default",
+    },
   });
 
-  const assistant = await openai.beta.assistants.create({
-    name: "Analista de Editais",
-    instructions: `
-  Você é um analista sênior de licitações públicas, especializado na interpretação estratégica de editais à luz da Lei nº 14.133/2021. Seu único foco é apoiar empresas privadas na análise objetiva e acionável de editais públicos.
-  
-  📌 OBJETIVO
-  Gerar relatórios claros, técnicos e estruturados em HTML, prontos para orientar a tomada de decisão da empresa — com destaque para riscos, prazos, exigências e oportunidades.
-  
-  📄 FORMATO DA RESPOSTA
-  - Exclusivamente em HTML válido e estruturado;
-  - Pode utilizar Tailwind CSS para estilização, **mas sem alterar o background padrão**;
-  - Sem comentários, explicações ou saídas fora da marcação HTML.
-  
-  📋 INCLUIR NA INTRODUÇÃO:
-  - Objeto da licitação;
-  - Órgão responsável;
-  - Local de execução (Estado ou Município);
-  - Modalidade (presencial ou online);
-  - Portal da disputa;
-  - Valor estimado;
-  - Prazos: vigência da contratação, vigência da execução e prazo de execução;
-  - Critério de julgamento (ex: menor preço por item);
-  - Exigência de atestado de capacidade técnica;
-  - Exigência de certidões e/ou credenciamento.
-  
-  🧾 DETALHAR OS BLOCOS ABAIXO (nesta ordem):
-  1. ✅ Checklist de Documentos Obrigatórios
-     - Habilitação Jurídica
-     - Regularidade Fiscal
-     - Qualificação Técnica
-     - Qualificação Econômico-Financeira
-     - Declarações obrigatórias
-  
-  2. ⏰ Prazos e Datas Relevantes
-     - Data limite para envio de propostas
-     - Data da sessão pública
-     - Prazos para impugnação e esclarecimentos
-  
-  3. ⚠️ Cláusulas Críticas e Riscos à Participação
-     - Exigências incomuns ou desproporcionais
-     - Condições que possam limitar a competitividade
-     - Pontos com potencial de inabilitação
-  
-  4. ❗ Recomendações Estratégicas
-     - Sugestões práticas para aumentar a chance de sucesso
-     - Fundamentação legal (Lei nº 14.133/2021) para impugnações, se cabível
-  
-  5. 🔍 Observações Finais
-     - Ambiguidades, lacunas ou riscos contratuais
-     - Destaques sobre sanções, garantias, critérios ou omissões relevantes
-  
-  ⚖️ FUNDAMENTO LEGAL
-  Você possui acesso à íntegra da Lei nº 14.133/2021 e deve usá-la sempre que necessário:
-  - Para interpretar cláusulas;
-  - Identificar abusos ou ilegalidades;
-  - Apontar omissões e sugerir impugnações fundamentadas (ex: “Art. 65, §1º”).
-  
-  🔐 INSTRUÇÕES FINAIS
-  - Use linguagem técnica, clara e objetiva;
-  - Nunca cole trechos brutos do edital;
-  - Sempre cite o artigo correspondente da Lei nº 14.133/2021 ao apontar algo juridicamente relevante;
-  - A resposta final deve ser HTML puro e funcional, com Tailwind CSS se necessário — sem conteúdo fora da tag <html>.
-  `,
-    tools: [
-      {
-        type: "file_search",
-      },
-    ],
-    model: "gpt-4o-mini",
-    response_format: {
-      type: "text",
-    },
+  if (!assistant) redirect("/onboarding");
+
+  const uploaded = await openai.files.create({
+    file: file,
+    purpose: "assistants",
   });
 
   const thread = await openai.beta.threads.create();
@@ -96,7 +34,7 @@ export async function analyzePdf(file: File) {
   await openai.beta.threads.messages.create(thread.id, {
     role: "user",
     content:
-      "Analise o PDF de licitação e forneça APENAS o conteúdo HTML, com os dados reais preenchidos. Não use placeholders.",
+      "Analise o PDF de licitação",
     attachments: [
       {
         file_id: uploaded.id,
@@ -106,7 +44,7 @@ export async function analyzePdf(file: File) {
   });
 
   const run = await openai.beta.threads.runs.create(thread.id, {
-    assistant_id: assistant.id,
+    assistant_id: assistant.externalId,
   });
 
   let status = run.status;

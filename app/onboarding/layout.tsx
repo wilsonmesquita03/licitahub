@@ -7,11 +7,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="pt-BR">
-      <body className="min-h-screen">
-        <OnboardingProvider>{children}</OnboardingProvider>
-      </body>
-    </html>
-  );
+  return <OnboardingProvider>{children}</OnboardingProvider>;
 }
