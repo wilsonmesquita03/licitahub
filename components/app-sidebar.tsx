@@ -27,6 +27,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
+import { usePathname } from "next/navigation";
+import { SidebarHistory } from "./chat/sidebar-history";
 
 // Menu items.
 const items = [
@@ -54,6 +56,7 @@ const items = [
 
 export function AppSidebar() {
   const session = useSession();
+  const pathname = usePathname();
 
   return (
     <Sidebar className="mt-[61px] h-[calc(100%-61px)]">
@@ -75,6 +78,14 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {pathname.includes("/analyzer") && session?.user && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Analises anteriores</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarHistory user={session.user} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter className="dark:bg-black">
         {session.user && (

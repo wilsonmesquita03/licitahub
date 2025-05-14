@@ -34,7 +34,7 @@ export async function analyzePdf(file: File) {
   await openai.beta.threads.messages.create(thread.id, {
     role: "user",
     content:
-      "Analise o PDF de licitação",
+      "Analise detalhadamente o PDF de licitação e siga suas instruções de resposta a risca",
     attachments: [
       {
         file_id: uploaded.id,
