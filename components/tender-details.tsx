@@ -5,11 +5,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, StarIcon, ArrowLeft, FileText, Clock } from "lucide-react";
-import Link from "next/link";
 import { CostEstimate } from "./cost-estimate";
 import { Tender, UnidadeOrgao, OrgaoEntidade } from "@prisma/client";
 import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
 import { useSession } from "@/app/session-provider";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface TenderDetailsProps {
   tender: Tender & {
@@ -19,6 +20,7 @@ interface TenderDetailsProps {
 }
 
 export function TenderDetails({ tender }: TenderDetailsProps) {
+  const router = useRouter();
   const { user } = useSession();
   const [isFollowed, setIsFollowed] = useState(
     !!user?.followedTenders.find((t) => t.id === tender.id)
@@ -38,10 +40,14 @@ export function TenderDetails({ tender }: TenderDetailsProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Link href="/opportunities" className="flex items-center gap-2 text-sm">
+        <Button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-sm"
+          variant="outline"
+        >
           <ArrowLeft className="h-4 w-4" />
-          Voltar para o Radar
-        </Link>
+          Voltar
+        </Button>
         <Button
           onClick={toggleFollow}
           variant={isFollowed ? "default" : "outline"}
@@ -69,7 +75,7 @@ export function TenderDetails({ tender }: TenderDetailsProps) {
             } text-white`}
           >
             {tender.purchaseStatusName === "Divulgada no PNCP"
-              ? "Aberto"
+              ? "Divulgada"
               : tender.purchaseStatusName}
           </Badge>
         </div>

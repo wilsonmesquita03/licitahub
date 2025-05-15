@@ -91,7 +91,7 @@ export function TenderCard({ tender }: TenderCardProps) {
               }
             >
               {tender.purchaseStatusName === "Divulgada no PNCP"
-                ? "Aberto"
+                ? "Divulgada"
                 : tender.purchaseStatusName}
             </Badge>
             <div className="text-right">

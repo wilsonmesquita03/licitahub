@@ -1,102 +1,230 @@
-'use client';
+// components/tender-filters.tsx
+"use client";
 
+import { useSearchParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectContent,
+  SelectItem,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import { addDays, subDays, format } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
-interface TenderFiltersProps {
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
-  selectedStatus: string;
-  onStatusChange: (value: string) => void;
-  selectedOrgan: string;
-  onOrganChange: (value: string) => void;
-  statusOptions: string[];
-  organOptions: string[];
-}
+export function TenderFilters() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const today = new Date();
+  const yesterday = subDays(today, 1);
+  const maxDate = addDays(yesterday, 8);
 
-export function TenderFilters({
-  searchTerm,
-  onSearchChange,
-  selectedStatus,
-  onStatusChange,
-  selectedOrgan,
-  onOrganChange,
-  statusOptions,
-  organOptions,
-}: TenderFiltersProps) {
+  const minDateStr = format(yesterday, "yyyy-MM-dd");
+  const maxDateStr = format(maxDate, "yyyy-MM-dd");
+
+  const [uf, setUf] = useState(searchParams.get("uf") || "");
+  const [startDate, setStartDate] = useState(
+    searchParams.get("startDate") || ""
+  );
+  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
+  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [disputeModeName, setDisputeModeName] = useState(
+    searchParams.get("disputeModeName") || ""
+  );
+  const [modalityName, setModalityName] = useState(
+    searchParams.get("modalityName") || ""
+  );
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (uf) params.set("uf", uf);
+    else params.delete("uf");
+    if (startDate) params.set("startDate", startDate);
+    else params.delete("startDate");
+    if (endDate) params.set("endDate", endDate);
+    else params.delete("endDate");
+    if (query) params.set("q", query);
+    else params.delete("q");
+    if (disputeModeName) params.set("disputeModeName", disputeModeName);
+    else params.delete("disputeModeName");
+    if (modalityName) params.set("modalityName", modalityName);
+    else params.delete("modalityName");
+
+    params.set("page", "1"); // resetar paginação
+
+    router.push(`?${params.toString()}`);
+  };
+
+  const estados = [
+    "AC",
+    "AL",
+    "AP",
+    "AM",
+    "BA",
+    "CE",
+    "DF",
+    "ES",
+    "GO",
+    "MA",
+    "MT",
+    "MS",
+    "MG",
+    "PA",
+    "PB",
+    "PR",
+    "PE",
+    "PI",
+    "RJ",
+    "RN",
+    "RS",
+    "RO",
+    "RR",
+    "SC",
+    "SP",
+    "SE",
+    "TO",
+  ];
+
+  const disputeModes = [
+    "Aberto",
+    "Fechado",
+    "Aberto-Fechado",
+    "Dispensa Com Disputa",
+    "Não se aplica",
+    "Fechado-Aberto",
+  ];
+  const modalities = [
+    "Leilão - Eletrônico",
+    "Diálogo Competitivo",
+    "Concurso",
+    "Concorrência - Eletrônica",
+    "Concorrência - Presencial",
+    "Pregão - Eletrônico",
+    "Pregão - Presencial",
+    "Dispensa de Licitação",
+    "Inexigibilidade",
+    "Manifestação de Interesse",
+    "Pré-qualificação",
+    "Credenciamento",
+    "Leilão - Presencial",
+  ];
+
   return (
-    <>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl font-bold">Radar de Oportunidades</h1>
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col md:flex-row gap-4 items-end"
+    >
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Filtrar</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col md:flex-row gap-4 items-end">
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-1">Buscar</label>
+            <Input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
 
-        <div className="w-full md:w-auto">
-          <Input
-            placeholder="Buscar por título ou entidade..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <Card className="p-4 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <Select value={selectedStatus} onValueChange={onStatusChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o status" />
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-1">UF</label>
+            <Select onValueChange={setUf} value={uf}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Selecionar UF" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Status</SelectItem>
-                {statusOptions.map((status) => (
-                  <SelectItem key={status} value={status} className="capitalize">
-                    {status.replace('_', ' ')}
+                {estados.map((estado) => (
+                  <SelectItem key={estado} value={estado}>
+                    {estado}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Entidade</Label>
-            <Select value={selectedOrgan} onValueChange={onOrganChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o órgão" />
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-1">Modalidade</label>
+            <Select onValueChange={setModalityName} value={modalityName}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Selecionar modalidade" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as Entidades</SelectItem>
-                {organOptions.map((organ) => (
-                  <SelectItem key={organ} value={organ}>
-                    {organ}
+                {modalities.map((mod) => (
+                  <SelectItem key={mod} value={mod}>
+                    {mod}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Ordenar por</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Mais recentes" />
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-1">Modo de Disputa</label>
+            <Select onValueChange={setDisputeModeName} value={disputeModeName}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Selecionar modo de disputa" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="recent">Mais recentes</SelectItem>
-                <SelectItem value="deadline">Prazo mais curto</SelectItem>
-                <SelectItem value="value">Maior valor</SelectItem>
+                {disputeModes.map((mode) => (
+                  <SelectItem key={mode} value={mode}>
+                    {mode}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-        </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-1">
+              Data de Publicação (de)
+            </label>
+            <Input
+              type="date"
+              value={startDate}
+              min={minDateStr}
+              max={maxDateStr}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-1">
+              Data de Publicação (até)
+            </label>
+            <Input
+              type="date"
+              value={endDate}
+              min={minDateStr}
+              max={maxDateStr}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+
+          <Button type="submit">Filtrar</Button>
+
+          <Button
+            type="reset"
+            variant="outline"
+            onClick={() => {
+              setQuery("");
+              setUf("");
+              setModalityName("");
+              setDisputeModeName("");
+              setStartDate("");
+              setEndDate("");
+            }}
+          >
+            Limpar filtros
+          </Button>
+        </CardContent>
       </Card>
-    </>
+    </form>
   );
 }

@@ -2,36 +2,96 @@
 import { TenderList } from "@/components/tender-list";
 import { prisma } from "@/lib/prisma";
 import { PaginationControls } from "@/components/pagination-controls";
+import { TenderFilters } from "@/components/tender-filters";
+import { Prisma } from "@prisma/client";
 
 export default async function RadarPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ page?: string; limit?: string }>;
+  searchParams?: Promise<{
+    page?: string;
+    limit?: string;
+    uf?: string;
+    startDate?: string;
+    endDate?: string;
+    q?: string;
+    disputeModeName?: string;
+    modalityName?: string;
+  }>;
 }) {
-  const currentPage = Number((await searchParams)?.page) || 1;
-  const limit = Number((await searchParams)?.limit) || 50;
+  const params = await searchParams;
+  const page = parseInt(params?.page || "1");
+  const limit = parseInt(params?.limit || "50");
+  const uf = params?.uf;
+  const startDate = params?.startDate;
+  const endDate = params?.endDate;
+  const query = params?.q;
 
-  const tenders = await prisma.tender.findMany({
-    skip: (currentPage - 1) * limit,
-    take: limit,
-    include: {
-      unidadeOrgao: true,
-      orgaoEntidade: true,
-    },
-  });
+  const where: Prisma.TenderWhereInput = {
+    ...(uf && {
+      unidadeOrgao: {
+        stateAbbr: uf,
+      },
+    }),
+    ...(startDate || endDate
+      ? {
+          publicationDatePncp: {
+            ...(startDate && { gte: new Date(startDate) }),
+            ...(endDate && { lte: new Date(endDate) }),
+          },
+        }
+      : {}),
 
-  const totalTenders = await prisma.tender.count();
+    ...(query && {
+      OR: [
+        {
+          purchaseObject: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          orgaoEntidade: {
+            companyName: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        },
+      ],
+    }),
+    ...(params?.disputeModeName && {
+      disputeModeName: params.disputeModeName,
+    }),
+    ...(params?.modalityName && {
+      modalityName: params.modalityName,
+    }),
+  };
+
+  const [tenders, totalTenders] = await Promise.all([
+    prisma.tender.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where,
+      include: {
+        unidadeOrgao: true,
+        orgaoEntidade: true,
+      },
+    }),
+    prisma.tender.count({ where }),
+  ]);
+
   const totalPages = Math.ceil(totalTenders / limit);
 
   return (
     <div className="container mx-auto p-4 space-y-6 relative">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl font-bold">Radar de Oportunidades</h1>
-      </div>
+      <h1 className="text-2xl font-bold">Radar de Oportunidades</h1>
+
+      <TenderFilters />
 
       <TenderList tenders={tenders} />
       <PaginationControls
-        currentPage={currentPage}
+        currentPage={page}
         totalPages={totalPages}
         limit={limit}
       />

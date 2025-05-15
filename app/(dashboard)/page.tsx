@@ -10,8 +10,73 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Bell, FileSearch, FileText, Search } from "lucide-react";
+import { getSession } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const session = await getSession();
+
+  if (!session.user) {
+    redirect("/opportunities");
+  }
+
+  const tenderCount = await prisma.tender.count();
+
+  const tenderFavorited = await prisma.tender.findMany({
+    where: {
+      followedBy: {
+        some: {
+          id: session.user.id,
+        },
+      },
+    },
+    select: {
+      id: true,
+      purchaseObject: true,
+      orgaoEntidade: {
+        select: {
+          companyName: true,
+        },
+      },
+    },
+  });
+
+  const opportunities = await prisma.tender.findMany({
+    where: {
+      proposalClosingDate: {
+        gte: new Date(),
+      },
+      approvedTotalValue: {
+        not: null,
+      },
+      estimatedTotalValue: {
+        not: 0,
+      },
+      electronicProcessLink: {
+        not: null,
+      },
+      sourceSystemLink: {
+        not: null,
+      },
+    },
+    take: 3,
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      purchaseObject: true,
+      estimatedTotalValue: true,
+      orgaoEntidade: {
+        select: {
+          companyName: true,
+        },
+      },
+    },
+  });
+
   return (
     <>
       <div className="flex min-h-screen bg-background">
@@ -31,13 +96,12 @@ export default function Dashboard() {
                 <CardTitle className="text-sm font-medium">
                   Oportunidades Abertas
                 </CardTitle>
-                <Search className="h-4 w-4 text-muted-foreground" />
+                <Link href="/opportunities">
+                  <Search className="h-4 w-4 text-muted-foreground" />
+                </Link>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground">
-                  +2 novas desde ontem
-                </p>
+                <div className="text-2xl font-bold">{tenderCount}</div>
               </CardContent>
             </Card>
             <Card>
@@ -48,10 +112,14 @@ export default function Dashboard() {
                 <FileSearch className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">4</div>
-                <p className="text-xs text-muted-foreground">
-                  2 pendentes de revisão
-                </p>
+                <div className="text-2xl font-bold">
+                  {tenderFavorited.length}
+                </div>
+                {/* 
+                  <p className="text-xs text-muted-foreground">
+                    2 pendentes de revisão
+                  </p>
+                */}
               </CardContent>
             </Card>
             <Card>
@@ -120,6 +188,24 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    {opportunities.map((opportunity) => (
+                      <Link
+                        key={opportunity.id}
+                        href={`/opportunities/${opportunity.id}`}
+                      >
+                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                          <div>
+                            <h3 className="font-medium">
+                              {opportunity.orgaoEntidade.companyName}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {opportunity.purchaseObject}
+                            </p>
+                          </div>
+                          <Badge>{opportunity.estimatedTotalValue}</Badge>
+                        </div>
+                      </Link>
+                    ))}
                     {[1, 2, 3].map((i) => (
                       <div
                         key={i}
@@ -150,19 +236,23 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {[1, 2].map((i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between p-4 border rounded-lg"
+                    {tenderFavorited.map((tender) => (
+                      <Link
+                        key={tender.id}
+                        href={`/opportunities/${tender.id}`}
                       >
-                        <div>
-                          <h3 className="font-medium">Edital PE 123/2024</h3>
-                          <p className="text-sm text-muted-foreground">
-                            15 documentos pendentes
-                          </p>
+                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                          <div>
+                            <h3 className="font-medium">
+                              {tender.orgaoEntidade.companyName}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {tender.purchaseObject}
+                            </p>
+                          </div>
+                          <Badge variant="secondary">Em Análise</Badge>
                         </div>
-                        <Badge variant="secondary">Em Análise</Badge>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </CardContent>
