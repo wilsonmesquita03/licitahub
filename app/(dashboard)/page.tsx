@@ -48,9 +48,6 @@ export default async function Dashboard() {
       proposalClosingDate: {
         gte: new Date(),
       },
-      approvedTotalValue: {
-        not: null,
-      },
       estimatedTotalValue: {
         not: 0,
       },
@@ -205,22 +202,6 @@ export default async function Dashboard() {
                           <Badge>{opportunity.estimatedTotalValue}</Badge>
                         </div>
                       </Link>
-                    ))}
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between p-4 border rounded-lg"
-                      >
-                        <div>
-                          <h3 className="font-medium">
-                            Aquisição de Equipamentos de TI
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            Prefeitura Municipal de São Paulo
-                          </p>
-                        </div>
-                        <Badge>R$ 1.5M</Badge>
-                      </div>
                     ))}
                   </div>
                 </CardContent>
