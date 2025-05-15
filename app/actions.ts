@@ -6,6 +6,7 @@ import { CostItem } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { OpenAI } from "openai";
+import pdfMake from "pdfMake";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -176,4 +177,7 @@ export async function getCosts(file: File): Promise<{ costs: CostItem[] }> {
   throw new Error("Execução não concluída");
 }
 
-export async function analizeEdital() {}
+export async function makePdf() {
+  const make = new pdfMake({});
+
+}
