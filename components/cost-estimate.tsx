@@ -23,6 +23,8 @@ import { Tender } from "@prisma/client";
 import { CostItem } from "@/types/tender";
 import { Badge } from "./ui/badge";
 import { getCosts } from "@/app/actions";
+import { addCostAction } from "@/app/(dashboard)/opportunities/actions";
+import useSWR from "swr";
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("pt-BR", {
@@ -45,12 +47,25 @@ export function CostEstimate({ tender }: CostEstimateProps) {
   });
   const [safetyMargin, setSafetyMargin] = useState<number>(10);
 
+  useSWR(
+    `/api/tender/${tender.id}/costs`,
+    async () => {
+      const response = await fetch(`/api/tender/${tender.id}/costs`);
+      return response.json();
+    },
+    {
+      onSuccess: (data) => {
+        setCosts(data);
+      },
+    }
+  );
+
   const categories = [
-    { value: "mão_de_obra", label: "Mão de Obra" },
-    { value: "materiais", label: "Materiais" },
-    { value: "equipamentos", label: "Equipamentos" },
-    { value: "serviços", label: "Serviços" },
-    { value: "outros", label: "Outros" },
+    { value: "MATERIAL", label: "Materiais" },
+    { value: "SERVICO", label: "Serviços" },
+    { value: "TRANSPORTE", label: "Transporte" },
+    { value: "TRIBUTOS", label: "Tributos" },
+    { value: "OUTROS", label: "Outros" },
   ];
 
   const handleFileChange = async (
@@ -70,15 +85,29 @@ export function CostEstimate({ tender }: CostEstimateProps) {
     }
   };
 
-  const addCost = () => {
+  const addCost = async () => {
     if (newCost.description && newCost.value > 0) {
+      const costToAdd: {
+        type: "FIXED" | "VARIABLE";
+        category: "MATERIAL" | "SERVICO" | "TRANSPORTE" | "TRIBUTOS" | "OUTROS";
+        description: string;
+        value: number;
+      } = {
+        ...newCost,
+        type: "FIXED",
+        category: "SERVICO",
+      };
+
+      const response = await addCostAction(tender.id, costToAdd);
+
       setCosts([
         ...costs,
         {
-          id: Math.random().toString(),
-          ...newCost,
-          type: "manual",
-          category: "serviços",
+          id: response.id,
+          type: response.type,
+          description: response.description,
+          category: response.category,
+          value: response.value,
         },
       ]);
       setNewCost({ description: "", category: "materiais", value: 0 });
@@ -202,11 +231,6 @@ export function CostEstimate({ tender }: CostEstimateProps) {
                             ?.label
                         }
                       </Badge>
-                      {cost.type === "automatic" && (
-                        <Badge variant="secondary" className="text-green-600">
-                          Sugerido por IA
-                        </Badge>
-                      )}
                     </div>
                     <p className="text-sm text-muted-foreground">
                       {formatCurrency(cost.value)}

@@ -1,14 +1,9 @@
 export interface CostItem {
   id: string;
   description: string;
-  category:
-    | "mão_de_obra"
-    | "materiais"
-    | "equipamentos"
-    | "serviços"
-    | "outros";
+  category: "MATERIAL" | "SERVICO" | "TRANSPORTE" | "TRIBUTOS" | "OUTROS";
   value: number;
-  type: "manual" | "automatic";
+  type: "FIXED" | "VARIABLE";
 }
 
 export interface Tender {

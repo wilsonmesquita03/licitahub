@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { TenderDetails } from "@/components/tender-details";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
 import { Prisma } from "@prisma/client";
 
 interface PageProps {

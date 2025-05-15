@@ -147,6 +147,12 @@ export async function POST(request: Request) {
       country,
     };
 
+    const userContext = await prisma.onboardingResponse.findMany({
+      where: {
+        userId: session.user.id,
+      },
+    });
+
     await prisma.message.create({
       data: {
         id: message.id,
@@ -172,7 +178,7 @@ export async function POST(request: Request) {
       execute: (dataStream) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
+          system: systemPrompt({ selectedChatModel, userContext }),
           messages: messages,
           maxSteps: 5,
           experimental_transform: smoothStream({ chunking: "word" }),

@@ -1,4 +1,5 @@
 import type { ArtifactKind } from "@/components/chat/artifact";
+import { OnboardingResponse } from "@prisma/client";
 import type { Geo } from "@vercel/functions";
 
 export const artifactsPrompt = `
@@ -110,23 +111,23 @@ export interface RequestHints {
   country: Geo["country"];
 }
 
-export const getRequestPromptFromHints = (requestHints: RequestHints) => `\
-About the origin of user's request:
-- lat: ${requestHints.latitude}
-- lon: ${requestHints.longitude}
-- city: ${requestHints.city}
-- country: ${requestHints.country}
+export const getRequestPromptFromHints = (
+  requestHints: OnboardingResponse[]
+) => `\
+Sobre o usuário e sua empresa:
+${requestHints.map((hint) => `**${hint.question}**: ${hint.answer}`).join("\n")}
 `;
 
 export const systemPrompt = ({
   selectedChatModel,
-  requestHints,
+  userContext,
 }: {
   selectedChatModel: string;
-  requestHints?: RequestHints;
+  userContext?: OnboardingResponse[];
 }) => {
-  //const requestPrompt = getRequestPromptFromHints(requestHints);
-  const requestPrompt = "";
+  const requestPrompt = userContext
+    ? getRequestPromptFromHints(userContext)
+    : "";
 
   if (selectedChatModel === "chat-model-reasoning") {
     return `${regularPrompt}\n\n${requestPrompt}`;
