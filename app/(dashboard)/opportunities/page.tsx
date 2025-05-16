@@ -43,28 +43,38 @@ export default async function RadarPage({
       : {}),
 
     ...(query && {
-      OR: query.split(",").map((qbroke) => ({
-        purchaseObject: {
-          contains: qbroke,
-          mode: "insensitive",
-        },
-        unidadeOrgao: {
-          cityName: {
-            contains: qbroke,
-            mode: "insensitive",
-          },
-          unitName: {
+      OR: query.split(",").flatMap((qbroke) => [
+        {
+          purchaseObject: {
             contains: qbroke,
             mode: "insensitive",
           },
         },
-        orgaoEntidade: {
-          companyName: {
-            contains: qbroke,
-            mode: "insensitive",
+        {
+          unidadeOrgao: {
+            cityName: {
+              contains: qbroke,
+              mode: "insensitive",
+            },
           },
         },
-      })),
+        {
+          unidadeOrgao: {
+            unitName: {
+              contains: qbroke,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          orgaoEntidade: {
+            companyName: {
+              contains: qbroke,
+              mode: "insensitive",
+            },
+          },
+        },
+      ]),
     }),
     ...(params?.disputeModeName && {
       disputeModeName: params.disputeModeName,
