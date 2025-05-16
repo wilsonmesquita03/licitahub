@@ -112,13 +112,13 @@ export function TenderFilters() {
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-1">Buscar</label>
-            <TagInput onChange={(q) => setQuery(q)} />
+            <TagInput onChange={(q) => setQuery(q)} value={query} />
           </div>
 
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-1">UF</label>
             <Select onValueChange={setUf} value={uf}>
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger>
                 <SelectValue placeholder="Selecionar UF" />
               </SelectTrigger>
               <SelectContent>
@@ -134,7 +134,7 @@ export function TenderFilters() {
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-1">Modalidade</label>
             <Select onValueChange={setModalityName} value={modalityName}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger>
                 <SelectValue placeholder="Selecionar modalidade" />
               </SelectTrigger>
               <SelectContent>
@@ -150,7 +150,7 @@ export function TenderFilters() {
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-1">Modo de Disputa</label>
             <Select onValueChange={setDisputeModeName} value={disputeModeName}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger>
                 <SelectValue placeholder="Selecionar modo de disputa" />
               </SelectTrigger>
               <SelectContent>
@@ -172,6 +172,7 @@ export function TenderFilters() {
               setUf("");
               setModalityName("");
               setDisputeModeName("");
+              setQuery([]);
             }}
           >
             Limpar filtros

@@ -9,28 +9,27 @@ import { Button } from "./ui/button";
 type TagInputProps = {
   placeholder?: string;
   onChange?: (tags: string[]) => void;
+  value?: string[];
 };
 
 export default function TagInput({
   placeholder = "Digite e pressione Enter",
   onChange,
+  value = [], // valor default para evitar undefined
 }: TagInputProps) {
-  const [tags, setTags] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const addTag = (value: string) => {
-    const trimmed = value.trim();
-    if (trimmed && !tags.includes(trimmed)) {
-      const newTags = [...tags, trimmed];
-      setTags(newTags);
+  const addTag = (newTag: string) => {
+    const trimmed = newTag.trim();
+    if (trimmed && !value.includes(trimmed)) {
+      const newTags = [...value, trimmed];
       onChange?.(newTags);
     }
   };
 
   const removeTag = (index: number) => {
-    const newTags = tags.filter((_, i) => i !== index);
-    setTags(newTags);
+    const newTags = value.filter((_, i) => i !== index);
     onChange?.(newTags);
   };
 
@@ -39,14 +38,14 @@ export default function TagInput({
       e.preventDefault();
       addTag(inputValue);
       setInputValue("");
-    } else if (e.key === "Backspace" && !inputValue && tags.length) {
-      removeTag(tags.length - 1);
+    } else if (e.key === "Backspace" && !inputValue && value.length) {
+      removeTag(value.length - 1);
     }
   };
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-md border border-input px-3 py-2 focus-within:ring-2 focus-within:ring-ring">
-      {tags.map((tag, index) => (
+      {value.map((tag, index) => (
         <Badge
           key={index}
           variant="secondary"

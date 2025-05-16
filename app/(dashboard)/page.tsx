@@ -38,9 +38,6 @@ export default async function Dashboard() {
           id: session.user.id,
         },
       },
-      globalUpdateDate: {
-        gt: "2077-01-01T03:00:00.000Z",
-      },
     },
     select: {
       id: true,
@@ -258,7 +255,7 @@ export default async function Dashboard() {
                         Nenhum edital em análise
                       </p>
                     )}
-                    {tenderFavorited.map((tender) => (
+                    {/* tenderFavorited.map((tender) => (
                       <Link
                         key={tender.id}
                         href={`/opportunities/${tender.id}`}
@@ -275,7 +272,7 @@ export default async function Dashboard() {
                           <Badge variant="secondary">Em Análise</Badge>
                         </div>
                       </Link>
-                    ))}
+                    )) */}
                   </div>
                 </CardContent>
               </Card>
