@@ -3,11 +3,6 @@ import axios from "axios";
 import { prisma } from "@/lib/prisma";
 import { Compra } from "@/types/pncp";
 import { capitalizarTexto } from "@/lib/utils";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 export async function GET(
   request: NextRequest,
@@ -35,12 +30,6 @@ export async function GET(
 
   let pagina = Number(request.nextUrl.searchParams.get("page")) || 1;
   let totalPaginas = 1;
-
-  openai.embeddings.create({
-    model: "text-embedding-3-small",
-    input: "Hello world",
-    encoding_format: "float"
-  })
 
   while (pagina <= totalPaginas) {
     const elapsed = Date.now() - start;

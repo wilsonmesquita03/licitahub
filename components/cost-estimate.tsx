@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlusCircle, Trash2, Info, Percent, DollarSign } from "lucide-react";
+import { PlusCircle, Trash2, Info } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -136,20 +136,6 @@ export function CostEstimate({ tender }: CostEstimateProps) {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Gestão de Custos</h2>
         <div className="flex items-center gap-4">
-          <label htmlFor="file-upload" className="cursor-pointer">
-            <Button
-              type="button"
-              className="bg-green-300 relative overflow-hidden"
-            >
-              IA
-              <input
-                id="file-upload"
-                type="file"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                onChange={handleFileChange}
-              />
-            </Button>
-          </label>
           <Button onClick={() => setShowAddForm(!showAddForm)}>
             <PlusCircle className="w-4 h-4 mr-2" />
             Adicionar Custo

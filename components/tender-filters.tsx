@@ -3,7 +3,6 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -12,25 +11,16 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { addDays, subDays, format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import TagInput from "./tag-input";
 
 export function TenderFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const today = new Date();
-  const yesterday = subDays(today, 1);
-  const maxDate = addDays(yesterday, 8);
-
-  const minDateStr = format(yesterday, "yyyy-MM-dd");
-  const maxDateStr = format(maxDate, "yyyy-MM-dd");
-
   const [uf, setUf] = useState(searchParams.get("uf") || "");
-  const [startDate, setStartDate] = useState(
-    searchParams.get("startDate") || ""
+  const [query, setQuery] = useState<string[]>(
+    searchParams.get("q")?.split(",") || []
   );
-  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
-  const [query, setQuery] = useState(searchParams.get("q") || "");
   const [disputeModeName, setDisputeModeName] = useState(
     searchParams.get("disputeModeName") || ""
   );
@@ -44,11 +34,7 @@ export function TenderFilters() {
 
     if (uf) params.set("uf", uf);
     else params.delete("uf");
-    if (startDate) params.set("startDate", startDate);
-    else params.delete("startDate");
-    if (endDate) params.set("endDate", endDate);
-    else params.delete("endDate");
-    if (query) params.set("q", query);
+    if (query) params.set("q", query.join(","));
     else params.delete("q");
     if (disputeModeName) params.set("disputeModeName", disputeModeName);
     else params.delete("disputeModeName");
@@ -123,14 +109,10 @@ export function TenderFilters() {
         <CardHeader>
           <CardTitle>Filtrar</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col md:flex-row gap-4 items-end">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-1">Buscar</label>
-            <Input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
+            <TagInput onChange={(q) => setQuery(q)} />
           </div>
 
           <div className="flex flex-col">
@@ -181,44 +163,15 @@ export function TenderFilters() {
             </Select>
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-sm font-medium mb-1">
-              Data de Publicação (de)
-            </label>
-            <Input
-              type="date"
-              value={startDate}
-              min={minDateStr}
-              max={maxDateStr}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <label className="text-sm font-medium mb-1">
-              Data de Publicação (até)
-            </label>
-            <Input
-              type="date"
-              value={endDate}
-              min={minDateStr}
-              max={maxDateStr}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
-
           <Button type="submit">Filtrar</Button>
 
           <Button
             type="reset"
             variant="outline"
             onClick={() => {
-              setQuery("");
               setUf("");
               setModalityName("");
               setDisputeModeName("");
-              setStartDate("");
-              setEndDate("");
             }}
           >
             Limpar filtros

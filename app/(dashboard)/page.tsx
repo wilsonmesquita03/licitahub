@@ -14,6 +14,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { differenceInDays, differenceInHours } from "date-fns";
 
 export default async function Dashboard() {
   const session = await getSession();
@@ -22,7 +23,13 @@ export default async function Dashboard() {
     redirect("/opportunities");
   }
 
-  const tenderCount = await prisma.tender.count();
+  const tenderCount = await prisma.tender.count({
+    where: {
+      proposalClosingDate: {
+        gte: new Date(),
+      },
+    },
+  });
 
   const tenderFavorited = await prisma.tender.findMany({
     where: {
@@ -31,6 +38,9 @@ export default async function Dashboard() {
           id: session.user.id,
         },
       },
+      globalUpdateDate: {
+        gt: "2077-01-01T03:00:00.000Z",
+      },
     },
     select: {
       id: true,
@@ -40,39 +50,42 @@ export default async function Dashboard() {
           companyName: true,
         },
       },
+      estimatedTotalValue: true,
+      proposalClosingDate: true,
+      process: true,
     },
   });
 
-  const opportunities = await prisma.tender.findMany({
-    where: {
-      proposalClosingDate: {
-        gte: new Date(),
-      },
-      estimatedTotalValue: {
-        not: 0,
-      },
-      electronicProcessLink: {
-        not: null,
-      },
-      sourceSystemLink: {
-        not: null,
-      },
-    },
-    take: 3,
-    orderBy: {
-      createdAt: "desc",
-    },
-    select: {
-      id: true,
-      purchaseObject: true,
-      estimatedTotalValue: true,
-      orgaoEntidade: {
-        select: {
-          companyName: true,
-        },
-      },
-    },
-  });
+  const importantDeadlines = tenderFavorited
+    .filter((tender) => {
+      const diffInHours = differenceInHours(
+        tender.proposalClosingDate,
+        new Date()
+      );
+      return diffInHours > 0;
+    })
+    .map((tender) => {
+      const diffInDays = differenceInDays(
+        tender.proposalClosingDate,
+        new Date()
+      );
+
+      if (diffInDays >= 1) {
+        return {
+          ...tender,
+          timeLeft: `${diffInDays} dia${diffInDays > 1 ? "s" : ""}`,
+        };
+      } else {
+        const diffInHours = differenceInHours(
+          tender.proposalClosingDate,
+          new Date()
+        );
+        return {
+          ...tender,
+          timeLeft: `${diffInHours} hora${diffInHours > 1 ? "s" : ""}`,
+        };
+      }
+    });
 
   return (
     <>
@@ -151,24 +164,37 @@ export default async function Dashboard() {
           <Alert className="mb-8">
             <AlertTitle>Prazos Importantes</AlertTitle>
             <AlertDescription>
-              <ul className="mt-2 space-y-2">
-                <li className="flex items-center justify-between">
-                  <span>
-                    Pregão Eletrônico 123/2024 - Prefeitura de São Paulo
-                  </span>
-                  <Badge variant="destructive">Vence em 2 dias</Badge>
-                </li>
-                <li className="flex items-center justify-between">
-                  <span>Concorrência 45/2024 - DNIT</span>
-                  <Badge>Vence em 5 dias</Badge>
-                </li>
+              <ul className="space-y-1 mt-4">
+                {importantDeadlines.map((tender) => (
+                  <li
+                    key={tender.id}
+                    className="flex items-center justify-between"
+                  >
+                    <span>
+                      {tender.orgaoEntidade.companyName} - {tender.process}
+                    </span>
+                    <Badge variant="destructive">{tender.timeLeft}</Badge>
+                  </li>
+                ))}
               </ul>
+              {importantDeadlines.length === 0 && (
+                <>
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Nenhuma oportunidade favoritada com prazo definido
+                  </p>
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    <Link href="/opportunities">
+                      Ver todas as Oportunidades
+                    </Link>
+                  </p>
+                </>
+              )}
             </AlertDescription>
           </Alert>
 
           {/* Recent Activities */}
           <Tabs defaultValue="opportunities" className="space-y-4">
-            <TabsList>
+            <TabsList className="grid w-full h-fit grid-cols-1 md:grid-cols-3">
               <TabsTrigger value="opportunities">
                 Oportunidades Recentes
               </TabsTrigger>
@@ -185,12 +211,17 @@ export default async function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {opportunities.map((opportunity) => (
+                    {tenderFavorited.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        Nenhuma oportunidade favoritada
+                      </p>
+                    )}
+                    {tenderFavorited.map((opportunity) => (
                       <Link
                         key={opportunity.id}
                         href={`/opportunities/${opportunity.id}`}
                       >
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center justify-between gap-4 p-4 border rounded-lg">
                           <div>
                             <h3 className="font-medium">
                               {opportunity.orgaoEntidade.companyName}
@@ -199,7 +230,12 @@ export default async function Dashboard() {
                               {opportunity.purchaseObject}
                             </p>
                           </div>
-                          <Badge>{opportunity.estimatedTotalValue}</Badge>
+                          <Badge>
+                            {opportunity.estimatedTotalValue.toLocaleString(
+                              "pt-BR",
+                              { style: "currency", currency: "BRL" }
+                            )}
+                          </Badge>
                         </div>
                       </Link>
                     ))}
@@ -217,6 +253,11 @@ export default async function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    {tenderFavorited.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        Nenhum edital em análise
+                      </p>
+                    )}
                     {tenderFavorited.map((tender) => (
                       <Link
                         key={tender.id}
