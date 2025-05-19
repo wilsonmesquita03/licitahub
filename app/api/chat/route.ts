@@ -5,7 +5,7 @@ import {
   smoothStream,
   streamText,
 } from "ai";
-import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
+import { systemPrompt } from "@/lib/ai/prompts";
 import { generateUUID, getTrailingMessageId } from "@/lib/utils";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { updateDocument } from "@/lib/ai/tools/update-document";
@@ -15,7 +15,6 @@ import { isProductionEnvironment } from "@/lib/constants";
 import { myProvider } from "@/lib/ai/providers";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
 import { postRequestBodySchema, type PostRequestBody } from "./schema";
-import { geolocation } from "@vercel/functions";
 import {
   createResumableStreamContext,
   type ResumableStreamContext,
@@ -137,15 +136,6 @@ export async function POST(request: Request) {
       messages: previousMessages,
       message,
     });
-
-    const { longitude, latitude, city, country } = geolocation(request);
-
-    const requestHints: RequestHints = {
-      longitude,
-      latitude,
-      city,
-      country,
-    };
 
     const userContext = await prisma.onboardingResponse.findMany({
       where: {
