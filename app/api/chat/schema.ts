@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const textPartSchema = z.object({
-  text: z.string().max(2000),
+  text: z.string(),
   type: z.enum(["text"]),
 });
 
@@ -11,7 +11,7 @@ export const postRequestBodySchema = z.object({
     id: z.string().uuid(),
     createdAt: z.coerce.date(),
     role: z.enum(["user"]),
-    content: z.string().max(2000),
+    content: z.string(),
     parts: z.array(textPartSchema),
     experimental_attachments: z
       .array(

@@ -4,6 +4,7 @@ import {
   createDataStream,
   smoothStream,
   streamText,
+  generateText,
 } from "ai";
 import { systemPrompt } from "@/lib/ai/prompts";
 import { generateUUID, getTrailingMessageId } from "@/lib/utils";
@@ -31,6 +32,7 @@ import {
   getMessagesByChatId,
   getStreamIdsByChatId,
 } from "@/lib/db/queries";
+import { checkIfRelatedToFile } from "@/lib/utils/server";
 
 export const maxDuration = 60;
 
@@ -130,6 +132,32 @@ export async function POST(request: Request) {
         createdAt: "asc",
       },
     });
+
+    const conversationHistory = previousMessages
+      .map((msg) => {
+        const role = msg.role === "user" ? "Usuário" : "Assistente";
+        // @ts-expect-error
+        const text = msg.parts
+          // @ts-expect-error
+          .filter((part) => part.type === "text")
+          // @ts-expect-error
+          .map((part) => part.text)
+          .join(" ");
+        return `${role}: ${text}`;
+      })
+      .join("\n");
+
+    const pdfContent = previousMessages.flatMap((m) => m.attachments ?? []);
+
+    const relatedToFile = await checkIfRelatedToFile(
+      conversationHistory,
+      message.content
+    );
+
+    if (relatedToFile) {
+      // @ts-expect-error
+      message.experimental_attachments = pdfContent;
+    }
 
     const messages = appendClientMessage({
       // @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
@@ -248,6 +276,7 @@ export async function POST(request: Request) {
       return new Response(stream);
     }
   } catch (_) {
+    console.log(_);
     return new Response("An error occurred while processing your request!", {
       status: 500,
     });

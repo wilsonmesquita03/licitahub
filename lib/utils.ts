@@ -45,8 +45,14 @@ export function buildCompanyInfoPrompt(data: OnboardingFormData): string {
   return lines.join("\n");
 }
 
-import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from "ai";
+import {
+  generateText,
+  type CoreAssistantMessage,
+  type CoreToolMessage,
+  type UIMessage,
+} from "ai";
 import { Document } from "@prisma/client";
+import { openai } from "@ai-sdk/openai";
 
 interface ApplicationError extends Error {
   info: string;
@@ -116,5 +122,5 @@ export function getTrailingMessageId({
 }
 
 export function sanitizeText(text: string) {
-  return text.replace('<has_function_call>', '');
+  return text.replace("<has_function_call>", "");
 }

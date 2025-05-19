@@ -9,6 +9,7 @@ const nextConfig = {
       bodySizeLimit: "20mb",
     },
   },
+  serverExternalPackages: ["pdf-parse"]
 };
 
 module.exports = nextConfig;
