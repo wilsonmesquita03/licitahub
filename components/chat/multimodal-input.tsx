@@ -115,6 +115,7 @@ function PureMultimodalInput({
 
     handleSubmit(undefined, {
       experimental_attachments: attachments,
+      allowEmptySubmit: true
     });
 
     setAttachments([]);
@@ -390,7 +391,7 @@ function PureSendButton({
         event.preventDefault();
         submitForm();
       }}
-      disabled={input.length === 0 || uploadQueue.length > 0}
+      disabled={input.length === 0 && uploadQueue.length > 0}
     >
       <ArrowUpIcon size={14} />
     </Button>

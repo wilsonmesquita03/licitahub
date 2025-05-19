@@ -258,7 +258,6 @@ export async function POST(request: Request) {
       return new Response(stream);
     }
   } catch (_) {
-    console.log(_);
     return new Response("An error occurred while processing your request!", {
       status: 500,
     });
@@ -385,7 +384,6 @@ export async function DELETE(request: Request) {
 
     return Response.json(deletedChat, { status: 200 });
   } catch (error) {
-    console.error(error);
     return new Response("An error occurred while processing your request!", {
       status: 500,
     });

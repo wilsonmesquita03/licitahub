@@ -1,6 +1,6 @@
-import { OnboardingFormData } from '@/app/onboarding/onboarding-provider';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { OnboardingFormData } from "@/app/onboarding/onboarding-provider";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -45,8 +45,9 @@ export function buildCompanyInfoPrompt(data: OnboardingFormData): string {
   return lines.join("\n");
 }
 
-import type { CoreAssistantMessage, CoreToolMessage, Message, UIMessage } from 'ai';
-import { Document } from '@prisma/client';
+import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from "ai";
+import { Document } from "@prisma/client";
+
 interface ApplicationError extends Error {
   info: string;
   status: number;
@@ -57,7 +58,7 @@ export const fetcher = async (url: string) => {
 
   if (!res.ok) {
     const error = new Error(
-      'An error occurred while fetching the data.',
+      "An error occurred while fetching the data."
     ) as ApplicationError;
 
     error.info = await res.json();
@@ -70,16 +71,16 @@ export const fetcher = async (url: string) => {
 };
 
 export function getLocalStorage(key: string) {
-  if (typeof window !== 'undefined') {
-    return JSON.parse(localStorage.getItem(key) || '[]');
+  if (typeof window !== "undefined") {
+    return JSON.parse(localStorage.getItem(key) || "[]");
   }
   return [];
 }
 
 export function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -88,13 +89,13 @@ type ResponseMessageWithoutId = CoreToolMessage | CoreAssistantMessage;
 type ResponseMessage = ResponseMessageWithoutId & { id: string };
 
 export function getMostRecentUserMessage(messages: Array<UIMessage>) {
-  const userMessages = messages.filter((message) => message.role === 'user');
+  const userMessages = messages.filter((message) => message.role === "user");
   return userMessages.at(-1);
 }
 
 export function getDocumentTimestampByIndex(
   documents: Array<Document>,
-  index: number,
+  index: number
 ) {
   if (!documents) return new Date();
   if (index > documents.length) return new Date();

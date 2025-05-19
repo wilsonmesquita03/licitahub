@@ -84,10 +84,8 @@
     "openai": "^4.97.0",
     "orderedmap": "^2.1.1",
     "papaparse": "^5.5.2",
-    "pdf-parse": "^1.1.1",
     "pdfmake": "0.3.0-beta.1",
     "postcss": "8.4.30",
-    "postgres": "^3.4.5",
     "prisma": "^6.7.0",
     "prosemirror-example-setup": "^1.2.3",
     "prosemirror-inputrules": "^1.5.0",
@@ -123,7 +121,6 @@
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/papaparse": "^5.3.16",
-    "@types/pdf-parse": "^1.1.5",
     "@types/pdfmake": "^0.2.11",
     "@types/react": "19.1.3"
   }

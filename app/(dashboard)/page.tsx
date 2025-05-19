@@ -53,6 +53,12 @@ export default async function Dashboard() {
     },
   });
 
+  const analysis = await prisma.chat.findMany({
+    where: {
+      userId: session.user.id,
+    }
+  })
+
   const importantDeadlines = tenderFavorited
     .filter((tender) => {
       const diffInHours = differenceInHours(
@@ -120,7 +126,7 @@ export default async function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {tenderFavorited.length}
+                  {analysis.length}
                 </div>
                 {/* 
                   <p className="text-xs text-muted-foreground">
@@ -255,24 +261,21 @@ export default async function Dashboard() {
                         Nenhum edital em análise
                       </p>
                     )}
-                    {/* tenderFavorited.map((tender) => (
+                    {analysis.map((analysis) => (
                       <Link
-                        key={tender.id}
-                        href={`/opportunities/${tender.id}`}
+                        key={analysis.id}
+                        href={`/analyzer/${analysis.id}`}
                       >
                         <div className="flex items-center justify-between p-4 border rounded-lg">
                           <div>
                             <h3 className="font-medium">
-                              {tender.orgaoEntidade.companyName}
+                              {analysis.title}
                             </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {tender.purchaseObject}
-                            </p>
                           </div>
                           <Badge variant="secondary">Em Análise</Badge>
                         </div>
                       </Link>
-                    )) */}
+                    ))}
                   </div>
                 </CardContent>
               </Card>
