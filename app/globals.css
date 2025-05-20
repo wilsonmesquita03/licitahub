@@ -16,6 +16,18 @@
   }
 }
 
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+    .min-w-7 {
+      min-width: 1.75rem;
+    } 
+    .min-w-3 {
+      min-width: 0.75rem;
+    }  
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -51,6 +63,7 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --min-w-7: 
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -95,4 +108,99 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.skeleton {
+    * {
+        pointer-events: none !important;
+    }
+
+    *[class^="text-"] {
+        color: transparent;
+        @apply rounded-md bg-foreground/20 select-none animate-pulse;
+    }
+
+    .skeleton-bg {
+        @apply bg-foreground/10;
+    }
+
+    .skeleton-div {
+        @apply bg-foreground/20 animate-pulse;
+    }
+}
+
+.ProseMirror {
+  @apply outline-none;
+}
+
+.ProseMirror > h1 {
+  @apply text-3xl font-bold mb-4;
+}
+
+.ProseMirror > h2 {
+  @apply text-2xl font-semibold mb-3;
+}
+
+.ProseMirror > p {
+  @apply text-base leading-relaxed mb-2;
+}
+
+.ProseMirror > ul {
+  @apply list-disc mb-2 space-y-4 list-outside pl-6;
+}
+
+.ProseMirror > ol {
+  @apply list-decimal list-inside mb-2;
+}
+
+.ProseMirror > blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic text-gray-600 mb-2;
+}
+
+.ProseMirror strong {
+  @apply font-semibold;
+}
+
+.ProseMirror em {
+  @apply italic;
+}
+
+.ProseMirror a {
+  @apply text-blue-600 underline hover:text-blue-800;
+}
+
+.cm-editor,
+.cm-gutters {
+    @apply bg-background dark:bg-zinc-800 outline-none selection:bg-zinc-900 !important;
+}
+
+.ͼo.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground,
+.ͼo.cm-selectionBackground,
+.ͼo.cm-content::selection {
+    @apply bg-zinc-200 dark:bg-zinc-900 !important;
+}
+
+.cm-activeLine,
+.cm-activeLineGutter {
+    @apply bg-transparent !important;
+}
+
+.cm-activeLine {
+    @apply rounded-r-sm !important;
+}
+
+.cm-lineNumbers {
+    @apply min-w-7;
+}
+
+.cm-foldGutter {
+    @apply min-w-3;
+}
+
+.cm-lineNumbers .cm-activeLineGutter {
+    @apply rounded-l-sm !important;
+}
+
+.suggestion-highlight {
+    @apply bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-400/50 dark:text-blue-50 dark:bg-blue-500/40;
 }

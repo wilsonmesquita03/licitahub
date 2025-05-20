@@ -6,6 +6,8 @@ import { generateUUID } from "../utils";
 import { generateHashedPassword } from "./utils";
 import type { VisibilityType } from "@/components/chat/visibility-selector";
 import { prisma } from "../prisma";
+import { createClient } from "../utils/server";
+import { cookies } from "next/headers";
 
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
@@ -526,5 +528,116 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
   } catch (error) {
     console.error("Failed to get stream ids by chat id from database");
     throw error;
+  }
+}
+
+export async function getTenders(searchParams?: {
+  page?: string;
+  limit?: string;
+  uf?: string;
+  q?: string; // termo de busca no purchaseObject
+  disputeModeName?: string;
+  modalityName?: string;
+}) {
+  const page = Number(searchParams?.page || 1);
+  const limit = Number(searchParams?.limit || 50);
+  const q = searchParams?.q?.trim();
+  const uf = searchParams?.uf;
+  const disputeModeName = searchParams?.disputeModeName;
+  const modalityName = searchParams?.modalityName;
+
+  if (process.env.NODE_ENV === "development") {
+    const where: any = {};
+
+    if (q) {
+      where.purchaseObject = { contains: q, mode: "insensitive" };
+    }
+    if (uf) {
+      where.uf = uf;
+    }
+    if (disputeModeName) {
+      where.disputeModeName = disputeModeName;
+    }
+    if (modalityName) {
+      where.modalityName = modalityName;
+    }
+
+    const [tenders, totalTenders] = await Promise.all([
+      prisma.tender.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          unidadeOrgao: true,
+          orgaoEntidade: true,
+        },
+      }),
+      prisma.tender.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(totalTenders / limit);
+
+    return { tenders, totalPages, page, limit };
+  } else {
+    const cookieStore = cookies();
+    const supabase = await createClient(cookieStore);
+
+    const params = searchParams;
+    const page = parseInt(params?.page || "1");
+    const limit = parseInt(params?.limit || "50");
+    const offset = (page - 1) * limit;
+
+    const filters = [];
+
+    // Filtros simples
+    if (params?.uf) {
+      filters.push(`unidadeOrgao->>stateAbbr=eq.${params.uf}`);
+    }
+
+    if (params?.disputeModeName) {
+      filters.push(`disputeModeName=eq.${params.disputeModeName}`);
+    }
+
+    if (params?.modalityName) {
+      filters.push(`modalityName=eq.${params.modalityName}`);
+    }
+
+    // Full-text search apenas no campo purchaseObject
+    const textSearchQuery = params?.q?.trim();
+
+    const queryBuilder = supabase
+      .from("Tender")
+      .select(
+        `
+      *,
+      unidadeOrgao:unidadeOrgaoId(*),
+      orgaoEntidade:orgaoEntidadeId(*)
+      `,
+        { count: "exact" }
+      )
+      .range(offset, offset + limit - 1);
+
+    if (textSearchQuery) {
+      queryBuilder.textSearch("search_vector", textSearchQuery, {
+        type: "websearch", // ou "plain"
+        config: "portuguese",
+      });
+    }
+
+    // Aplicar filtros extras
+    for (const filter of filters) {
+      const [col, val] = filter.split("=");
+      queryBuilder.filter(col, val.split(".")[0] as any, val.split(".")[1]);
+    }
+
+    const { data: tenders, count, error } = await queryBuilder;
+
+    if (error) {
+      console.error(error);
+    }
+
+    const totalPages = Math.ceil((count ?? 0) / limit);
+
+    return { tenders, page, totalPages, limit };
   }
 }

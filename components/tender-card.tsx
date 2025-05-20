@@ -51,7 +51,7 @@ export function TenderCard({ tender }: TenderCardProps) {
             <p className="text-sm text-muted-foreground mt-1">
               {tender.unidadeOrgao.stateName} • {tender.modalityName}
             </p>
-            <p className="text-sm mt-2 line-clamp-2">{tender.purchaseObject}</p>
+            <p className="text-sm max-w-[75%] mt-2 line-clamp-4">{tender.purchaseObject}</p>
           </div>
           <Button
             variant="ghost"

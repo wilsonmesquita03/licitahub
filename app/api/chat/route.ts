@@ -4,7 +4,6 @@ import {
   createDataStream,
   smoothStream,
   streamText,
-  generateText,
 } from "ai";
 import { systemPrompt } from "@/lib/ai/prompts";
 import { generateUUID, getTrailingMessageId } from "@/lib/utils";
@@ -145,16 +144,8 @@ export async function POST(request: Request) {
           .join(" ");
         return `${role}: ${text}`;
       })
+      .slice(-10)
       .join("\n");
-
-    const pdfContent = previousMessages.flatMap((m) => m.attachments ?? []);
-
-    const uniqueAttachments = {};
-
-    for (const attachment of pdfContent) {
-      // @ts-expect-error
-      uniqueAttachments[attachment.url] = attachment;
-    }
 
     const relatedToFile = await checkIfRelatedToFile(
       conversationHistory,
@@ -162,6 +153,15 @@ export async function POST(request: Request) {
     );
 
     if (relatedToFile) {
+      const pdfContent = previousMessages.flatMap((m) => m.attachments ?? []);
+
+      const uniqueAttachments = {};
+
+      for (const attachment of pdfContent) {
+        // @ts-expect-error
+        uniqueAttachments[attachment.url] = attachment;
+      }
+
       message.experimental_attachments = Object.values(uniqueAttachments);
     }
 
