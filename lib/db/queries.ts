@@ -546,14 +546,20 @@ export async function getTenders(searchParams?: {
   const disputeModeName = searchParams?.disputeModeName;
   const modalityName = searchParams?.modalityName;
 
-  if (process.env.NODE_ENV === "production") {
-    const where: any = {};
+  if (process.env.NODE_ENV === "development") {
+    const where: Prisma.TenderWhereInput = {
+      proposalClosingDate: {
+        gte: new Date(),
+      },
+    };
 
     if (q) {
       where.purchaseObject = { contains: q, mode: "insensitive" };
     }
     if (uf) {
-      where.uf = uf;
+      where.unidadeOrgao = {
+        stateAbbr: uf,
+      };
     }
     if (disputeModeName) {
       where.disputeModeName = disputeModeName;
