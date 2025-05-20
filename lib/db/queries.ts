@@ -626,7 +626,7 @@ export async function getTenders(searchParams?: {
       .map((term) => term.trim())
       .filter(Boolean);
 
-    if (textSearchQuery) {
+    if (textSearchQuery && textSearchQuery.length > 0) {
       const orQuery = textSearchQuery.join(" or ");
 
       queryBuilder.textSearch("search_vector", orQuery, {
