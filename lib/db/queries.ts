@@ -546,7 +546,7 @@ export async function getTenders(searchParams?: {
   const disputeModeName = searchParams?.disputeModeName;
   const modalityName = searchParams?.modalityName;
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "production") {
     const where: any = {};
 
     if (q) {
@@ -602,9 +602,6 @@ export async function getTenders(searchParams?: {
       filters.push(`modalityName=eq.${params.modalityName}`);
     }
 
-    // Full-text search apenas no campo purchaseObject
-    const textSearchQuery = params?.q?.trim();
-
     const queryBuilder = supabase
       .from("Tender")
       .select(
@@ -617,9 +614,17 @@ export async function getTenders(searchParams?: {
       )
       .range(offset, offset + limit - 1);
 
+    // Full-text search apenas no campo purchaseObject
+    const textSearchQuery = params?.q
+      ?.split(",")
+      .map((term) => term.trim())
+      .filter(Boolean);
+
     if (textSearchQuery) {
-      queryBuilder.textSearch("search_vector", textSearchQuery, {
-        type: "websearch", // ou "plain"
+      const orQuery = textSearchQuery.join(" or ");
+
+      queryBuilder.textSearch("search_vector", orQuery, {
+        type: "websearch",
         config: "portuguese",
       });
     }

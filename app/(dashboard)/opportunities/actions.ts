@@ -51,3 +51,7 @@ export async function addCostAction(
     },
   });
 }
+
+export async function deleteCostAction(costId: string) {
+  await prisma.costItem.delete({ where: { id: costId } });
+}

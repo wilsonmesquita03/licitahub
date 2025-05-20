@@ -32,13 +32,13 @@ export function TenderFilters() {
     e.preventDefault();
     const params = new URLSearchParams(searchParams.toString());
 
-    if (uf) params.set("uf", uf);
+    if (uf && uf !== "Todas") params.set("uf", uf);
     else params.delete("uf");
     if (query) params.set("q", query.join(","));
     else params.delete("q");
-    if (disputeModeName) params.set("disputeModeName", disputeModeName);
+    if (disputeModeName && disputeModeName !== "Todas") params.set("disputeModeName", disputeModeName);
     else params.delete("disputeModeName");
-    if (modalityName) params.set("modalityName", modalityName);
+    if (modalityName && modalityName !== "Todas") params.set("modalityName", modalityName);
     else params.delete("modalityName");
 
     params.set("page", "1"); // resetar paginação
@@ -47,6 +47,7 @@ export function TenderFilters() {
   };
 
   const estados = [
+    "Todas",
     "AC",
     "AL",
     "AP",
@@ -77,6 +78,7 @@ export function TenderFilters() {
   ];
 
   const disputeModes = [
+    "Todas",
     "Aberto",
     "Fechado",
     "Aberto-Fechado",
@@ -85,6 +87,7 @@ export function TenderFilters() {
     "Fechado-Aberto",
   ];
   const modalities = [
+    "Todas",
     "Leilão - Eletrônico",
     "Diálogo Competitivo",
     "Concurso",

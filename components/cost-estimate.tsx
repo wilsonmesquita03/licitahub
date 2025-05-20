@@ -23,7 +23,10 @@ import { Tender } from "@prisma/client";
 import { CostItem } from "@/types/tender";
 import { Badge } from "./ui/badge";
 import { getCosts } from "@/app/actions";
-import { addCostAction } from "@/app/(dashboard)/opportunities/actions";
+import {
+  addCostAction,
+  deleteCostAction,
+} from "@/app/(dashboard)/opportunities/actions";
 import useSWR from "swr";
 
 const formatCurrency = (value: number) => {
@@ -54,8 +57,17 @@ export function CostEstimate({ tender }: CostEstimateProps) {
       return response.json();
     },
     {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
       onSuccess: (data) => {
-        setCosts(data);
+        setCosts((prev) => {
+          const existingIds = new Set(prev.map((item) => item.id));
+          const uniqueItems = data.filter(
+            (item: CostItem) => !existingIds.has(item.id)
+          );
+          return [...prev, ...uniqueItems];
+        });
       },
     }
   );
@@ -115,7 +127,8 @@ export function CostEstimate({ tender }: CostEstimateProps) {
     }
   };
 
-  const removeCost = (id: string) => {
+  const removeCost = async (id: string) => {
+    await deleteCostAction(id);
     setCosts(costs.filter((cost) => cost.id !== id));
   };
 
