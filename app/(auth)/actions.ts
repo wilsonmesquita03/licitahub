@@ -59,6 +59,12 @@ export async function signup(prevState: any, formData: FormData) {
     },
   });
 
+  const loginForm = new FormData();
+  loginForm.set("email", email);
+  loginForm.set("password", password);
+
+  await signin(null, loginForm);
+
   return { success: true };
 }
 

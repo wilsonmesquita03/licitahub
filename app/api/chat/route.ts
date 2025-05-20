@@ -149,14 +149,20 @@ export async function POST(request: Request) {
 
     const pdfContent = previousMessages.flatMap((m) => m.attachments ?? []);
 
+    const uniqueAttachments = {};
+
+    for (const attachment of pdfContent) {
+      // @ts-expect-error
+      uniqueAttachments[attachment.url] = attachment;
+    }
+
     const relatedToFile = await checkIfRelatedToFile(
       conversationHistory,
       message.content
     );
 
     if (relatedToFile) {
-      // @ts-expect-error
-      message.experimental_attachments = pdfContent;
+      message.experimental_attachments = Object.values(uniqueAttachments);
     }
 
     const messages = appendClientMessage({
