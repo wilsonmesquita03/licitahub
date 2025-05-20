@@ -546,7 +546,7 @@ export async function getTenders(searchParams?: {
   const disputeModeName = searchParams?.disputeModeName;
   const modalityName = searchParams?.modalityName;
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV !== "development") {
     const where: Prisma.TenderWhereInput = {
       proposalClosingDate: {
         gte: new Date(),
@@ -593,11 +593,11 @@ export async function getTenders(searchParams?: {
     const limit = parseInt(params?.limit || "50");
     const offset = (page - 1) * limit;
 
-    const filters = [];
+    const filters = [`proposalClosingDate=gte.${new Date().toISOString()}`];
 
     // Filtros simples
     if (params?.uf) {
-      filters.push(`unidadeOrgao->>stateAbbr=eq.${params.uf}`);
+      filters.push(`unidadeOrgao.stateAbbr=eq.${params.uf}`);
     }
 
     if (params?.disputeModeName) {
@@ -613,7 +613,7 @@ export async function getTenders(searchParams?: {
       .select(
         `
       *,
-      unidadeOrgao:unidadeOrgaoId(*),
+      unidadeOrgao:unidadeOrgaoId!inner(*),
       orgaoEntidade:orgaoEntidadeId(*)
       `,
         { count: "exact" }
