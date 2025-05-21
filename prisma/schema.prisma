@@ -70,6 +70,8 @@ model Tender {
 
   followedBy User[] @relation("FollowedTenders")
 
+  search_vector Unsupported("tsvector")?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
             dataFinal,
             codigoModalidadeContratacao,
             pagina,
-            tamanhoPagina: 50
+            tamanhoPagina: 50,
           },
         }
       );
@@ -53,7 +53,14 @@ export async function GET(request: NextRequest) {
           if (unidade) {
             await prisma.unidadeOrgao.upsert({
               where: { unitCode: unidade.codigoUnidade },
-              update: {},
+              update: {
+                unitCode: unidade.codigoUnidade,
+                unitName: capitalizarTexto(unidade.nomeUnidade),
+                cityName: capitalizarTexto(unidade.municipioNome),
+                stateName: unidade.ufNome,
+                stateAbbr: unidade.ufSigla,
+                ibgeCode: unidade.codigoIbge,
+              },
               create: {
                 unitCode: unidade.codigoUnidade,
                 unitName: capitalizarTexto(unidade.nomeUnidade),
@@ -68,7 +75,12 @@ export async function GET(request: NextRequest) {
           if (orgao) {
             await prisma.orgaoEntidade.upsert({
               where: { cnpj: orgao.cnpj },
-              update: {},
+              update: {
+                cnpj: orgao.cnpj,
+                companyName: capitalizarTexto(orgao.razaoSocial),
+                powerId: orgao.poderId,
+                sphereId: orgao.esferaId,
+              },
               create: {
                 cnpj: orgao.cnpj,
                 companyName: capitalizarTexto(orgao.razaoSocial),
@@ -81,7 +93,11 @@ export async function GET(request: NextRequest) {
           if (amparo) {
             await prisma.amparoLegal.upsert({
               where: { code: amparo.codigo },
-              update: {},
+              update: {
+                code: amparo.codigo,
+                name: amparo.nome,
+                description: amparo.descricao,
+              },
               create: {
                 code: amparo.codigo,
                 name: amparo.nome,
@@ -92,7 +108,33 @@ export async function GET(request: NextRequest) {
 
           await prisma.tender.upsert({
             where: { pncpControlNumber: tender.numeroControlePNCP },
-            update: {},
+            update: {
+              purchaseNumber: tender.numeroCompra,
+              process: tender.processo,
+              purchaseYear: tender.anoCompra,
+              purchaseSequence: tender.sequencialCompra,
+              modalityId: tender.modalidadeId,
+              modalityName: tender.modalidadeNome,
+              instrumentTypeName: tender.tipoInstrumentoConvocatorioNome,
+              purchaseStatusId: tender.situacaoCompraId,
+              purchaseStatusName: tender.situacaoCompraNome,
+              purchaseObject: tender.objetoCompra,
+              estimatedTotalValue: tender.valorTotalEstimado,
+              approvedTotalValue: tender.valorTotalHomologado,
+              inclusionDate: new Date(tender.dataInclusao),
+              publicationDatePncp: new Date(tender.dataPublicacaoPncp),
+              updateDate: new Date(tender.dataAtualizacao),
+              proposalOpeningDate: new Date(tender.dataAberturaProposta),
+              proposalClosingDate: new Date(tender.dataEncerramentoProposta),
+              pncpControlNumber: tender.numeroControlePNCP,
+              globalUpdateDate: new Date(tender.dataAtualizacaoGlobal),
+              disputeModeId: tender.modoDisputaId,
+              disputeModeName: tender.modoDisputaNome,
+              srp: tender.srp,
+              userName: tender.usuarioNome,
+              sourceSystemLink: tender.linkSistemaOrigem,
+              electronicProcessLink: tender.linkProcessoEletronico,
+            },
             create: {
               purchaseNumber: tender.numeroCompra,
               process: tender.processo,
