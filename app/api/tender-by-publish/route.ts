@@ -239,7 +239,21 @@ export async function GET(request: NextRequest) {
         }
 
         console.time("CreateMany Tenders");
+        const INT_MIN = -2147483648;
+        const INT_MAX = 2147483647;
+
         const tendersCreateData = tenders
+          .filter((tender) => {
+            const { valorTotalEstimado, valorTotalHomologado } = tender;
+            return (
+              Number.isFinite(valorTotalEstimado) &&
+              Number.isFinite(valorTotalHomologado) &&
+              valorTotalEstimado >= INT_MIN &&
+              valorTotalEstimado <= INT_MAX &&
+              (valorTotalHomologado || 0) >= INT_MIN &&
+              (valorTotalHomologado || 0) <= INT_MAX
+            );
+          })
           .filter((tender) => tender?.numeroControlePNCP) // só tender válido
           .map((tender) => {
             const orgaoEntidadeId = orgaosExistentes.find(
@@ -283,7 +297,6 @@ export async function GET(request: NextRequest) {
               amparoLegalId,
             };
           });
-        console.timeEnd("CreateMany Tenders");
 
         // --- Inserir tenders em lote ---
         // Importante: configure seu schema para aceitar esses campos FK
@@ -292,6 +305,7 @@ export async function GET(request: NextRequest) {
           data: tendersCreateData,
           skipDuplicates: true,
         });
+        console.timeEnd("CreateMany Tenders");
 
         pagina++;
         console.timeEnd("Tempo total página");
