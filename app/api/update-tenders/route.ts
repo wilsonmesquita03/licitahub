@@ -121,6 +121,11 @@ export async function GET(request: NextRequest) {
           ? tendersResponse.data
           : [tendersResponse.data];
 
+        if (!tenders[0]) {
+          console.log("✔️ Nenhuma compra encontrada na pagina");
+          break;
+        }
+
         const pncpNumbers = tenders.map((t) => t.numeroControlePNCP);
 
         const existingTenders = await prisma.tender.findMany({
@@ -137,6 +142,11 @@ export async function GET(request: NextRequest) {
         const existingPncpSet = new Set(
           existingTenders.map((t) => t.pncpControlNumber)
         );
+
+        if (existingPncpSet.size === 0) {
+          console.log("✔️ Nenhuma compra encontrada na pagina");
+          break;
+        }
 
         await Promise.allSettled(
           tenders
