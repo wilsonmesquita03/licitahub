@@ -287,8 +287,12 @@ export async function GET(request: NextRequest) {
               inclusionDate: new Date(tender.dataInclusao),
               publicationDatePncp: new Date(tender.dataPublicacaoPncp),
               updateDate: new Date(tender.dataAtualizacao),
-              proposalOpeningDate: new Date(tender.dataAberturaProposta),
-              proposalClosingDate: new Date(tender.dataEncerramentoProposta),
+              proposalOpeningDate: tender.dataAberturaProposta
+                ? new Date(tender.dataAberturaProposta)
+                : null,
+              proposalClosingDate: tender.dataEncerramentoProposta
+                ? new Date(tender.dataEncerramentoProposta)
+                : null,
               pncpControlNumber: tender.numeroControlePNCP,
               globalUpdateDate: new Date(tender.dataAtualizacaoGlobal),
               disputeModeId: tender.modoDisputaId,

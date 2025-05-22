@@ -43,8 +43,8 @@ model Tender {
   inclusionDate         DateTime
   publicationDatePncp   DateTime
   updateDate            DateTime
-  proposalOpeningDate   DateTime
-  proposalClosingDate   DateTime
+  proposalOpeningDate   DateTime?
+  proposalClosingDate   DateTime?
   pncpControlNumber     String   @unique
   globalUpdateDate      DateTime
   disputeModeId         Int
