@@ -60,16 +60,16 @@ export default async function Dashboard() {
   })
 
   const importantDeadlines = tenderFavorited
-    .filter((tender) => {
+    .filter((tender) => tender.proposalClosingDate !== null).filter((tender) => {
       const diffInHours = differenceInHours(
-        tender.proposalClosingDate,
+        tender.proposalClosingDate as Date,
         new Date()
       );
       return diffInHours > 0;
     })
     .map((tender) => {
       const diffInDays = differenceInDays(
-        tender.proposalClosingDate,
+        tender.proposalClosingDate as Date,
         new Date()
       );
 
@@ -80,7 +80,7 @@ export default async function Dashboard() {
         };
       } else {
         const diffInHours = differenceInHours(
-          tender.proposalClosingDate,
+          tender.proposalClosingDate as Date,
           new Date()
         );
         return {
