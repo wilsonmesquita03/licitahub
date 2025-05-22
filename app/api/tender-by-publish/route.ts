@@ -112,6 +112,11 @@ export async function GET(request: NextRequest) {
         );
         console.timeEnd("Fetch API externa");
 
+        if (tendersResponse.empty) {
+          console.log("✔️ Nenhuma compra encontrada na pagina");
+          break;
+        }
+
         const tenders = Array.isArray(tendersResponse.data)
           ? tendersResponse.data
           : [tendersResponse.data];
