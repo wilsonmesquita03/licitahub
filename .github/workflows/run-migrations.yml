@@ -1,33 +1,22 @@
 name: Run DB Migrations
-
 on:
   push:
+    paths:
+      - prisma/migrations/**
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  migrate:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-
-      - name: Set up Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
-        with:
-          node-version: '20.18.3'
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
       - name: Install dependencies
-        run: pnpm install
-
-      - name: Run Prisma migrations (deploy mode)
+        run: npm install
+      - name: Apply all pending migrations to the database
+        run: npx prisma migrate deploy
         env:
-          DIRECT_URL: ${{secrets.DIRECT_URL}}
-        run: pnpm prisma migrate deploy
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
