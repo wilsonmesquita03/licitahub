@@ -105,10 +105,7 @@ export async function GET(request: NextRequest) {
     let totalPaginas = 1;
 
     if (pagina > totalPaginas) {
-      return NextResponse.json(
-        { error: "Nenhuma compra encontrada na pagina" },
-        { status: 200 }
-      );
+      continue;
     }
 
     do {
