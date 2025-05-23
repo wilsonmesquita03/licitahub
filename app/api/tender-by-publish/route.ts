@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { capitalizarTexto } from "@/lib/utils";
 import axios from "axios";
+import { parse } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 interface OrgaoEntidade {
@@ -91,8 +92,8 @@ export async function GET(request: NextRequest) {
       where: {
         codigoModalidadeContratacao_dataInicial_dataFinal: {
           codigoModalidadeContratacao,
-          dataInicial: new Date(dataInicial),
-          dataFinal: new Date(dataFinal),
+          dataInicial: new Date(parse(dataInicial, "yyyyMMdd", new Date())),
+          dataFinal: new Date(parse(dataFinal, "yyyyMMdd", new Date())),
         },
         endpoint: "/v1/contratacoes/publicacao",
       },
@@ -341,8 +342,10 @@ export async function GET(request: NextRequest) {
             where: {
               codigoModalidadeContratacao_dataInicial_dataFinal: {
                 codigoModalidadeContratacao,
-                dataInicial: new Date(dataInicial),
-                dataFinal: new Date(dataFinal),
+                dataInicial: new Date(
+                  parse(dataInicial, "yyyyMMdd", new Date())
+                ),
+                dataFinal: new Date(parse(dataFinal, "yyyyMMdd", new Date())),
               },
             },
             update: {
@@ -350,8 +353,8 @@ export async function GET(request: NextRequest) {
             },
             create: {
               codigoModalidadeContratacao,
-              dataInicial: new Date(dataInicial),
-              dataFinal: new Date(dataFinal),
+              dataInicial: new Date(parse(dataInicial, "yyyyMMdd", new Date())),
+              dataFinal: new Date(parse(dataFinal, "yyyyMMdd", new Date())),
               ultimaPaginaSincronizada: pagina,
               endpoint: "/v1/contratacoes/publicacao",
             },
