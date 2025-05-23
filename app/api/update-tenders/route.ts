@@ -204,25 +204,27 @@ export async function GET(request: NextRequest) {
 
         totalPaginas = tendersResponse.totalPaginas;
 
-        await prisma.pncpSyncProgress.upsert({
-          where: {
-            codigoModalidadeContratacao_dataInicial_dataFinal: {
+        if (tenders.length === 50) {
+          await prisma.pncpSyncProgress.upsert({
+            where: {
+              codigoModalidadeContratacao_dataInicial_dataFinal: {
+                codigoModalidadeContratacao,
+                dataInicial: new Date(dataInicial),
+                dataFinal: new Date(dataFinal),
+              },
+            },
+            update: {
+              ultimaPaginaSincronizada: pagina,
+            },
+            create: {
               codigoModalidadeContratacao,
               dataInicial: new Date(dataInicial),
               dataFinal: new Date(dataFinal),
+              ultimaPaginaSincronizada: pagina,
+              endpoint: "/v1/contratacoes/atualizacao",
             },
-          },
-          update: {
-            ultimaPaginaSincronizada: pagina,
-          },
-          create: {
-            codigoModalidadeContratacao,
-            dataInicial: new Date(dataInicial),
-            dataFinal: new Date(dataFinal),
-            ultimaPaginaSincronizada: pagina,
-            endpoint: "/v1/contratacoes/atualizacao",
-          },
-        });
+          });
+        }
 
         pagina++;
         console.timeEnd("Tempo total página");
