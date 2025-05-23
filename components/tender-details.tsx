@@ -111,7 +111,9 @@ export function TenderDetails({ tender }: TenderDetailsProps) {
             <div className="flex justify-between">
               <span>Encerramento de Propostas:</span>
               <span className="font-medium">
-                {tender.proposalClosingDate.toLocaleDateString("pt-BR")}
+                {tender.proposalClosingDate
+                  ? tender.proposalClosingDate.toLocaleDateString("pt-BR")
+                  : "Indefinido"}
               </span>
             </div>
 

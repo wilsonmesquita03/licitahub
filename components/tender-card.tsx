@@ -51,7 +51,9 @@ export function TenderCard({ tender }: TenderCardProps) {
             <p className="text-sm text-muted-foreground mt-1">
               {tender.unidadeOrgao.stateName} • {tender.modalityName}
             </p>
-            <p className="text-sm max-w-[75%] mt-2 line-clamp-4">{tender.purchaseObject}</p>
+            <p className="text-sm max-w-[75%] mt-2 line-clamp-4">
+              {tender.purchaseObject}
+            </p>
           </div>
           <Button
             variant="ghost"
@@ -97,9 +99,11 @@ export function TenderCard({ tender }: TenderCardProps) {
             <div className="text-right">
               <p className="text-sm text-muted-foreground">
                 Encerramento:{" "}
-                {new Date(tender.proposalClosingDate).toLocaleDateString(
-                  "pt-BR"
-                )}
+                {tender.proposalClosingDate
+                  ? new Date(tender.proposalClosingDate).toLocaleDateString(
+                      "pt-BR"
+                    )
+                  : "Indefinido"}
               </p>
               <p className="text-xs text-muted-foreground">
                 Publicação:{" "}
