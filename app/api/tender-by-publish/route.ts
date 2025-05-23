@@ -270,7 +270,9 @@ export async function GET(request: NextRequest) {
 
         const tendersCreateData = tenders
           .filter((tender) => {
-            const { valorTotalEstimado, valorTotalHomologado } = tender;
+            const valorTotalEstimado = tender?.valorTotalEstimado || 0;
+            const valorTotalHomologado = tender?.valorTotalHomologado || 0;
+
             return (
               Number.isFinite(valorTotalEstimado) &&
               Number.isFinite(valorTotalHomologado) &&
