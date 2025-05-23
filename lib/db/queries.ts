@@ -546,7 +546,7 @@ export async function getTenders(searchParams?: {
   const disputeModeName = searchParams?.disputeModeName;
   const modalityName = searchParams?.modalityName;
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV !== "development") {
     const where: Prisma.TenderWhereInput = {
       proposalClosingDate: {
         gte: new Date(),
@@ -593,7 +593,7 @@ export async function getTenders(searchParams?: {
     const limit = parseInt(params?.limit || "50");
     const offset = (page - 1) * limit;
 
-    const filters = [`proposalClosingDate=gte.${new Date().toISOString()}`];
+    const filters = [];
 
     // Filtros simples
     if (params?.uf) {
@@ -640,6 +640,10 @@ export async function getTenders(searchParams?: {
       const [col, val] = filter.split("=");
       queryBuilder.filter(col, val.split(".")[0] as any, val.split(".")[1]);
     }
+
+    queryBuilder.or(
+      `proposalClosingDate.gte.${new Date().toISOString()},proposalClosingDate.is.null`
+    );
 
     const { data: tenders, count, error } = await queryBuilder;
 

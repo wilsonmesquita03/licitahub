@@ -97,14 +97,14 @@ export function TenderCard({ tender }: TenderCardProps) {
                 : tender.purchaseStatusName}
             </Badge>
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">
-                Encerramento:{" "}
-                {tender.proposalClosingDate
-                  ? new Date(tender.proposalClosingDate).toLocaleDateString(
-                      "pt-BR"
-                    )
-                  : "Indefinido"}
-              </p>
+              {tender.proposalClosingDate && (
+                <p className="text-sm text-muted-foreground">
+                  Encerramento:{" "}
+                  {new Date(tender.proposalClosingDate).toLocaleDateString(
+                    "pt-BR"
+                  )}
+                </p>
+              )}
               <p className="text-xs text-muted-foreground">
                 Publicação:{" "}
                 {new Date(tender.publicationDatePncp).toLocaleDateString(

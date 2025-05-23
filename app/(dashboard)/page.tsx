@@ -25,9 +25,16 @@ export default async function Dashboard() {
 
   const tenderCount = await prisma.tender.count({
     where: {
-      proposalClosingDate: {
-        gte: new Date(),
-      },
+      OR: [
+        {
+          proposalClosingDate: {
+            gte: new Date(),
+          },
+        },
+        {
+          proposalClosingDate: null,
+        },
+      ],
     },
   });
 
@@ -56,11 +63,12 @@ export default async function Dashboard() {
   const analysis = await prisma.chat.findMany({
     where: {
       userId: session.user.id,
-    }
-  })
+    },
+  });
 
   const importantDeadlines = tenderFavorited
-    .filter((tender) => tender.proposalClosingDate !== null).filter((tender) => {
+    .filter((tender) => tender.proposalClosingDate !== null)
+    .filter((tender) => {
       const diffInHours = differenceInHours(
         tender.proposalClosingDate as Date,
         new Date()
@@ -125,9 +133,7 @@ export default async function Dashboard() {
                 <FileSearch className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {analysis.length}
-                </div>
+                <div className="text-2xl font-bold">{analysis.length}</div>
                 {/* 
                   <p className="text-xs text-muted-foreground">
                     2 pendentes de revisão
@@ -262,15 +268,10 @@ export default async function Dashboard() {
                       </p>
                     )}
                     {analysis.map((analysis) => (
-                      <Link
-                        key={analysis.id}
-                        href={`/analyzer/${analysis.id}`}
-                      >
+                      <Link key={analysis.id} href={`/analyzer/${analysis.id}`}>
                         <div className="flex items-center justify-between p-4 border rounded-lg">
                           <div>
-                            <h3 className="font-medium">
-                              {analysis.title}
-                            </h3>
+                            <h3 className="font-medium">{analysis.title}</h3>
                           </div>
                           <Badge variant="secondary">Em Análise</Badge>
                         </div>
