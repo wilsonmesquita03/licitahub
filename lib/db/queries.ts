@@ -546,7 +546,7 @@ export async function getTenders(searchParams?: {
   const disputeModeName = searchParams?.disputeModeName;
   const modalityName = searchParams?.modalityName;
 
-  if (process.env.NODE_ENV !== "development") {
+  if (process.env.NODE_ENV === "development") {
     const where: Prisma.TenderWhereInput = {
       proposalClosingDate: {
         gte: new Date(),
