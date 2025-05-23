@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { capitalizarTexto } from "@/lib/utils";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { parse } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -236,6 +236,10 @@ export async function GET(request: NextRequest) {
           `❌ Erro na página ${pagina} da modalidade ${codigoModalidadeContratacao}:`,
           error
         );
+
+        if (error instanceof AxiosError) {
+          return NextResponse.json({ error: "Erro no PNCP" }, { status: 500 });
+        }
       }
     } while (pagina <= totalPaginas);
   }
