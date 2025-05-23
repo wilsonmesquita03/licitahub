@@ -367,10 +367,6 @@ export async function GET(request: NextRequest) {
           `❌ Erro na página ${pagina} da modalidade ${codigoModalidadeContratacao}:`,
           error
         );
-
-        if (error instanceof AxiosError) {
-          return NextResponse.json({ error: "Erro no PNCP" }, { status: 500 });
-        }
       }
     } while (pagina <= totalPaginas);
   }
