@@ -87,7 +87,20 @@ export async function GET(request: NextRequest) {
     codigoModalidadeContratacao <= 13;
     codigoModalidadeContratacao++
   ) {
-    let pagina = 1;
+    const existingProgress = await prisma.pncpSyncProgress.findUnique({
+      where: {
+        codigoModalidadeContratacao_dataInicial_dataFinal: {
+          codigoModalidadeContratacao,
+          dataInicial: new Date(dataInicial),
+          dataFinal: new Date(dataFinal),
+        },
+        endpoint: "/v1/contratacoes/atualizacao",
+      },
+    });
+
+    let pagina = existingProgress
+      ? existingProgress.ultimaPaginaSincronizada + 1
+      : 1;
     let totalPaginas = 1;
 
     do {
@@ -190,6 +203,26 @@ export async function GET(request: NextRequest) {
         );
 
         totalPaginas = tendersResponse.totalPaginas;
+
+        await prisma.pncpSyncProgress.upsert({
+          where: {
+            codigoModalidadeContratacao_dataInicial_dataFinal: {
+              codigoModalidadeContratacao,
+              dataInicial: new Date(dataInicial),
+              dataFinal: new Date(dataFinal),
+            },
+          },
+          update: {
+            ultimaPaginaSincronizada: pagina,
+          },
+          create: {
+            codigoModalidadeContratacao,
+            dataInicial: new Date(dataInicial),
+            dataFinal: new Date(dataFinal),
+            ultimaPaginaSincronizada: pagina,
+            endpoint: "/v1/contratacoes/atualizacao",
+          },
+        });
 
         pagina++;
         console.timeEnd("Tempo total página");

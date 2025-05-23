@@ -27,7 +27,7 @@ model User {
 }
 
 model Tender {
-  id                    String   @id @default(cuid())
+  id                    String    @id @default(cuid())
   purchaseNumber        String
   process               String
   purchaseYear          Int
@@ -45,7 +45,7 @@ model Tender {
   updateDate            DateTime
   proposalOpeningDate   DateTime?
   proposalClosingDate   DateTime?
-  pncpControlNumber     String   @unique
+  pncpControlNumber     String    @unique
   globalUpdateDate      DateTime
   disputeModeId         Int
   disputeModeName       String
@@ -262,4 +262,16 @@ model Stream {
   createdAt DateTime
 
   chat Chat @relation(fields: [chatId], references: [id])
+}
+
+model PncpSyncProgress {
+  id                          Int      @id @default(autoincrement())
+  codigoModalidadeContratacao Int
+  dataInicial                 DateTime
+  dataFinal                   DateTime
+  ultimaPaginaSincronizada    Int
+  updatedAt                   DateTime @updatedAt
+  endpoint                    String
+
+  @@unique([codigoModalidadeContratacao, dataInicial, dataFinal])
 }
