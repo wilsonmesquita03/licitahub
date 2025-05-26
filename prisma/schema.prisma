@@ -273,5 +273,5 @@ model PncpSyncProgress {
   updatedAt                   DateTime @updatedAt
   endpoint                    String
 
-  @@unique([codigoModalidadeContratacao, dataInicial, dataFinal])
+  @@unique([codigoModalidadeContratacao, dataInicial, dataFinal, endpoint])
 }

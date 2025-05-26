@@ -90,12 +90,12 @@ export async function GET(request: NextRequest) {
   ) {
     const existingProgress = await prisma.pncpSyncProgress.findUnique({
       where: {
-        codigoModalidadeContratacao_dataInicial_dataFinal: {
+        codigoModalidadeContratacao_dataInicial_dataFinal_endpoint: {
           codigoModalidadeContratacao,
           dataInicial: new Date(parse(dataInicial, "yyyyMMdd", new Date())),
           dataFinal: new Date(parse(dataFinal, "yyyyMMdd", new Date())),
+          endpoint: "/v1/contratacoes/publicacao",
         },
-        endpoint: "/v1/contratacoes/publicacao",
       },
     });
 
@@ -339,14 +339,14 @@ export async function GET(request: NextRequest) {
         if (tenders.length === 50) {
           await prisma.pncpSyncProgress.upsert({
             where: {
-              codigoModalidadeContratacao_dataInicial_dataFinal: {
+              codigoModalidadeContratacao_dataInicial_dataFinal_endpoint: {
                 codigoModalidadeContratacao,
                 dataInicial: new Date(
                   parse(dataInicial, "yyyyMMdd", new Date())
                 ),
                 dataFinal: new Date(parse(dataFinal, "yyyyMMdd", new Date())),
+                endpoint: "/v1/contratacoes/publicacao",
               },
-              endpoint: "/v1/contratacoes/publicacao",
             },
             update: {
               ultimaPaginaSincronizada: pagina,
