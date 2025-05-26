@@ -215,6 +215,7 @@ export async function GET(request: NextRequest) {
                 ),
                 dataFinal: new Date(parse(dataFinal, "yyyyMMdd", new Date())),
               },
+              endpoint: "/v1/contratacoes/atualizacao",
             },
             update: {
               ultimaPaginaSincronizada: pagina,
