@@ -10,16 +10,31 @@ import { Tender, UnidadeOrgao, OrgaoEntidade } from "@prisma/client";
 import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
 import { useSession } from "@/app/session-provider";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+
+type DocumentoPncp = {
+  uri: string;
+  url: string;
+  tipoDocumentoId: number;
+  tipoDocumentoDescricao: string;
+  titulo: string;
+  sequencialDocumento: number;
+  dataPublicacaoPncp: string; // ISO string, pode usar Date se for convertido
+  cnpj: string;
+  anoCompra: number;
+  sequencialCompra: number;
+  statusAtivo: boolean;
+  tipoDocumentoNome: string;
+};
 
 interface TenderDetailsProps {
   tender: Tender & {
     unidadeOrgao: UnidadeOrgao;
     orgaoEntidade: OrgaoEntidade;
   };
+  files: DocumentoPncp[];
 }
 
-export function TenderDetails({ tender }: TenderDetailsProps) {
+export function TenderDetails({ tender, files }: TenderDetailsProps) {
   const router = useRouter();
   const { user } = useSession();
   const [isFollowed, setIsFollowed] = useState(
@@ -142,7 +157,44 @@ export function TenderDetails({ tender }: TenderDetailsProps) {
         </Card>
 
         <Card className="p-6 space-y-4 lg:col-span-2">
-          <h2 className="text-xl font-semibold">Documentos e Anexos</h2>
+          <div className="flex justify-between">
+            <h2 className="text-xl font-semibold">Documentos e Anexos</h2>
+            {tender.sourceSystemLink && (
+              <a
+                href={tender.sourceSystemLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto"
+              >
+                <Button variant="link" size="sm">
+                  Ver mais
+                </Button>
+              </a>
+            )}
+          </div>
+
+          {files.map(
+            ({ uri, tipoDocumentoDescricao, tipoDocumentoId, titulo }) => (
+              <div key="" className="space-y-2">
+                <div className="flex items-center gap-2 p-3 border rounded">
+                  <FileText className="h-5 w-5 text-blue-500" />
+                  <span>
+                    {tipoDocumentoId === 16 ? titulo : tipoDocumentoDescricao}
+                  </span>
+                  <a
+                    href={uri}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-auto"
+                  >
+                    <Button variant="link" size="sm">
+                      Acessar
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            )
+          )}
 
           {tender.sourceSystemLink ? (
             <div className="space-y-2">
@@ -173,18 +225,6 @@ export function TenderDetails({ tender }: TenderDetailsProps) {
         </Card>
 
         <CostEstimate tender={tender} />
-      </div>
-
-      <div className="flex gap-4 justify-end">
-        {tender.electronicProcessLink ? (
-          <Link href={tender.electronicProcessLink}>
-            <Button>Enviar Proposta</Button>
-          </Link>
-        ) : (
-          <Button className="cursor-not-allowed" disabled>
-            Enviar Proposta (Link Indisponível)
-          </Button>
-        )}
       </div>
     </div>
   );

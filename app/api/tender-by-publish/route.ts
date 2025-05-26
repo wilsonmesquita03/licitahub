@@ -26,7 +26,7 @@ interface AmparoLegal {
   codigo: number;
 }
 
-interface Compra {
+export interface Compra {
   srp: boolean;
   orgaoEntidade: OrgaoEntidade;
   anoCompra: number;
