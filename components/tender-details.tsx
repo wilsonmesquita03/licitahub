@@ -4,7 +4,15 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, StarIcon, ArrowLeft, FileText, Clock } from "lucide-react";
+import {
+  Star,
+  StarIcon,
+  ArrowLeft,
+  FileText,
+  Clock,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { CostEstimate } from "./cost-estimate";
 import { Tender, UnidadeOrgao, OrgaoEntidade } from "@prisma/client";
 import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
@@ -40,6 +48,7 @@ export function TenderDetails({ tender, files }: TenderDetailsProps) {
   const [isFollowed, setIsFollowed] = useState(
     !!user?.followedTenders.find((t) => t.id === tender.id)
   );
+  const [showAll, setShowAll] = useState(false);
 
   const statusColors = {
     "Divulgada no PNCP": "bg-green-500",
@@ -110,7 +119,7 @@ export function TenderDetails({ tender, files }: TenderDetailsProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="p-6 space-y-4">
+        <Card className="p-6 space-y-4 h-fit">
           <h2 className="text-xl font-semibold">Detalhes da Licitação</h2>
           <div className="space-y-3">
             <div className="flex justify-between">
@@ -173,9 +182,10 @@ export function TenderDetails({ tender, files }: TenderDetailsProps) {
             )}
           </div>
 
-          {files.map(
-            ({ uri, tipoDocumentoDescricao, tipoDocumentoId, titulo }) => (
-              <div key="" className="space-y-2">
+          {files
+            .slice(0, showAll ? files.length : 3)
+            .map(({ uri, tipoDocumentoDescricao, tipoDocumentoId, titulo }) => (
+              <div key={uri} className="space-y-2">
                 <div className="flex items-center gap-2 p-3 border rounded">
                   <FileText className="h-5 w-5 text-blue-500" />
                   <span>
@@ -193,27 +203,31 @@ export function TenderDetails({ tender, files }: TenderDetailsProps) {
                   </a>
                 </div>
               </div>
-            )
+            ))}
+
+          {files.length > 3 && (
+            <div className="flex justify-center mt-4">
+              <Button
+                variant="link"
+                onClick={() => setShowAll(!showAll)}
+                className="flex items-center gap-1"
+              >
+                {showAll ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Ver menos
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Ver mais
+                  </>
+                )}
+              </Button>
+            </div>
           )}
 
-          {tender.sourceSystemLink ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 p-3 border rounded">
-                <FileText className="h-5 w-5 text-blue-500" />
-                <span>Documento do Processo</span>
-                <a
-                  href={tender.sourceSystemLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-auto"
-                >
-                  <Button variant="link" size="sm">
-                    Acessar
-                  </Button>
-                </a>
-              </div>
-            </div>
-          ) : (
+          {files.length === 0 && (
             <div className="text-sm text-gray-500 space-y-2">
               <p>Nenhum documento disponível no momento.</p>
               <p>
