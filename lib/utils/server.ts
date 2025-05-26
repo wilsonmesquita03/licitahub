@@ -76,3 +76,10 @@ export async function createClient(cookieStore: ReturnType<typeof cookies>) {
     }
   );
 }
+
+
+export function isValidRedirect(path: string | null): boolean {
+  if (!path) return false;
+  // Permite apenas caminhos relativos
+  return typeof path === "string" && path.startsWith("/") && !path.includes("//");
+}

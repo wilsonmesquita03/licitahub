@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 import { redirect } from "next/navigation";
+import { isValidRedirect } from "@/lib/utils/server";
 
 const registerSchema = z
   .object({
@@ -77,6 +78,7 @@ export async function signin(prevState: any, formData: FormData) {
   const rawData = {
     email: formData.get("email"),
     password: formData.get("password"),
+    redirectFrom: formData.get("redirectFrom") || "",
   };
 
   let success = false;
@@ -134,7 +136,11 @@ export async function signin(prevState: any, formData: FormData) {
     }
   } finally {
     if (success) {
-      redirect("/");
+      const redirectTo = isValidRedirect(rawData.redirectFrom?.toString())
+        ? rawData.redirectFrom.toString()
+        : "/";
+
+      redirect(redirectTo);
     }
   }
 }

@@ -9,9 +9,12 @@ import { Label } from "@/components/ui/label";
 import { useActionState } from "react";
 import { signin } from "../actions";
 import { Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(signin, null);
+  const searchParams = useSearchParams();
+  const fromParam = searchParams.get("from");
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -19,6 +22,8 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-center">Acesse sua conta</h1>
 
         <form action={formAction} className="space-y-4">
+          <input type="hidden" name="redirectFrom" value={fromParam || ""} />
+
           <div>
             <Label>Email</Label>
             <Input name="email" type="email" placeholder="seu@email.com" />

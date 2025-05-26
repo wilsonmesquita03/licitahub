@@ -21,14 +21,9 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { useSession } from "@/app/session-provider";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import { usePathname } from "next/navigation";
 import { SidebarHistory } from "./chat/sidebar-history";
+import { LoginRequiredModal } from "./auth-required";
 
 // Menu items.
 const items = [
@@ -36,16 +31,18 @@ const items = [
     title: "Dashboard",
     url: "/",
     icon: LayoutDashboard,
-  },
-  {
-    title: "Radar de Oportunidades",
-    url: "/opportunities",
-    icon: Search,
+    auth: true,
   },
   {
     title: "Analisador de Editais",
     url: "/analyzer",
     icon: FileSearch,
+    auth: true,
+  },
+  {
+    title: "Radar de Oportunidades",
+    url: "/opportunities",
+    icon: Search,
   },
   {
     title: "Montador de Propostas",
@@ -67,12 +64,21 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                  {item.auth && !session.user ? (
+                    <LoginRequiredModal>
+                      <SidebarMenuButton>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    </LoginRequiredModal>
+                  ) : (
+                    <SidebarMenuButton asChild>
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

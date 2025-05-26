@@ -28,6 +28,7 @@ import {
   deleteCostAction,
 } from "@/app/(dashboard)/opportunities/actions";
 import useSWR from "swr";
+import { LoginRequiredModal } from "./auth-required";
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("pt-BR", {
@@ -149,10 +150,12 @@ export function CostEstimate({ tender }: CostEstimateProps) {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Gestão de Custos</h2>
         <div className="flex items-center gap-4">
-          <Button onClick={() => setShowAddForm(!showAddForm)}>
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Adicionar Custo
-          </Button>
+          <LoginRequiredModal>
+            <Button onClick={() => setShowAddForm(!showAddForm)}>
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Adicionar Custo
+            </Button>
+          </LoginRequiredModal>
         </div>
       </div>
 

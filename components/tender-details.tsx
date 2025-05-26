@@ -18,6 +18,7 @@ import { Tender, UnidadeOrgao, OrgaoEntidade } from "@prisma/client";
 import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
 import { useSession } from "@/app/session-provider";
 import { useRouter } from "next/navigation";
+import { LoginRequiredModal } from "./auth-required";
 
 type DocumentoPncp = {
   uri: string;
@@ -72,18 +73,20 @@ export function TenderDetails({ tender, files }: TenderDetailsProps) {
           <ArrowLeft className="h-4 w-4" />
           Voltar
         </Button>
-        <Button
-          onClick={toggleFollow}
-          variant={isFollowed ? "default" : "outline"}
-          className="gap-2"
-        >
-          {isFollowed ? (
-            <StarIcon className="h-4 w-4 fill-current" />
-          ) : (
-            <Star className="h-4 w-4" />
-          )}
-          {isFollowed ? "Seguindo" : "Seguir Licitação"}
-        </Button>
+        <LoginRequiredModal>
+          <Button
+            onClick={toggleFollow}
+            variant={isFollowed ? "default" : "outline"}
+            className="gap-2"
+          >
+            {isFollowed ? (
+              <StarIcon className="h-4 w-4 fill-current" />
+            ) : (
+              <Star className="h-4 w-4" />
+            )}
+            {isFollowed ? "Seguindo" : "Seguir Licitação"}
+          </Button>
+        </LoginRequiredModal>
       </div>
 
       <div className="space-y-2">
