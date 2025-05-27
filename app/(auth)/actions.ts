@@ -7,6 +7,7 @@ import { z } from "zod";
 import jwt from "jsonwebtoken";
 import { redirect } from "next/navigation";
 import { isValidRedirect } from "@/lib/utils/server";
+import { sendMail } from "@/lib/email";
 
 const registerSchema = z
   .object({
@@ -52,11 +53,27 @@ export async function signup(prevState: any, formData: FormData) {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       name,
       email,
       password: hashedPassword,
+    },
+  });
+
+  await prisma.userPreferences.create({
+    data: {
+      userId: user.id,
+    },
+  });
+
+  await sendMail({
+    to: email,
+    subject: "Bem-vindo ao LicitaHub!",
+    template: "welcome",
+    context: {
+      name,
+      appUrl: process.env.NEXT_PUBLIC_APP_URL,
     },
   });
 

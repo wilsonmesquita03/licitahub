@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,6 +14,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { differenceInDays, differenceInHours } from "date-fns";
+import NotificationPopover from "@/components/notifiction-popover";
 
 export default async function Dashboard() {
   const session = await getSession();
@@ -98,6 +98,12 @@ export default async function Dashboard() {
       }
     });
 
+  const userPreference = await prisma.userPreferences.findUnique({
+    where: {
+      userId: session.user.id,
+    },
+  });
+
   return (
     <>
       <div className="flex min-h-screen bg-background">
@@ -105,9 +111,7 @@ export default async function Dashboard() {
         <div className="flex-1 p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Dashboard</h1>
-            <Button variant="outline" size="icon">
-              <Bell className="h-5 w-5" />
-            </Button>
+            <NotificationPopover userPreference={userPreference} />
           </div>
 
           {/* Overview Cards */}

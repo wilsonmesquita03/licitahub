@@ -1,3 +1,4 @@
+import { updateTender } from "@/lib/db/queries";
 import { prisma } from "@/lib/prisma";
 import { capitalizarTexto } from "@/lib/utils";
 import axios, { AxiosError } from "axios";
@@ -166,9 +167,11 @@ export async function GET(request: NextRequest) {
           tenders
             .filter((tender) => existingPncpSet.has(tender.numeroControlePNCP))
             .map((tender) =>
-              prisma.tender.update({
-                where: { pncpControlNumber: tender.numeroControlePNCP },
-                data: {
+              updateTender(
+                {
+                  pncpControlNumber: tender.numeroControlePNCP,
+                },
+                {
                   purchaseNumber: tender.numeroCompra,
                   process: tender.processo,
                   purchaseYear: tender.anoCompra,
@@ -198,8 +201,8 @@ export async function GET(request: NextRequest) {
                   userName: tender.usuarioNome,
                   sourceSystemLink: tender.linkSistemaOrigem,
                   electronicProcessLink: tender.linkProcessoEletronico,
-                },
-              })
+                }
+              )
             )
         );
 

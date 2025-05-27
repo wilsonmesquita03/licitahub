@@ -24,6 +24,7 @@ model User {
   Suggestion         Suggestion[]
   Assistant          Assistant[]
   OnboardingResponse OnboardingResponse[]
+  UserPreferences    UserPreferences?
 }
 
 model Tender {
@@ -274,4 +275,12 @@ model PncpSyncProgress {
   endpoint                    String
 
   @@unique([codigoModalidadeContratacao, dataInicial, dataFinal, endpoint])
+}
+
+model UserPreferences {
+  id                    String  @id @default(uuid())
+  emailNotification     Boolean @default(true)
+  navigatorNotification Boolean @default(true)
+  User                  User    @relation(fields: [userId], references: [id])
+  userId                String  @unique
 }

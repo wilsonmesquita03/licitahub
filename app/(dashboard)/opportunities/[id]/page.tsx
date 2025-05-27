@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import axios from "axios";
 import { Compra } from "@/app/api/tender-by-publish/route";
+import { updateTender } from "@/lib/db/queries";
 
 interface PageProps {
   params: Promise<{
@@ -55,12 +56,9 @@ async function getTender(id: string) {
     .then(async (response) => {
       const tender = response.data;
 
-      await prisma.tender.update({
-        where: {
-          id: id,
-          pncpControlNumber: tender.numeroControlePNCP,
-        },
-        data: {
+      await updateTender(
+        { id, pncpControlNumber: tender.numeroControlePNCP },
+        {
           purchaseNumber: tender.numeroCompra,
           process: tender.processo,
           purchaseYear: tender.anoCompra,
@@ -90,8 +88,8 @@ async function getTender(id: string) {
           userName: tender.usuarioNome,
           sourceSystemLink: tender.linkSistemaOrigem,
           electronicProcessLink: tender.linkProcessoEletronico,
-        },
-      });
+        }
+      );
     });
 
   const { data: fileResponse } = await axios

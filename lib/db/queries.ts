@@ -8,6 +8,8 @@ import type { VisibilityType } from "@/components/chat/visibility-selector";
 import { prisma } from "../prisma";
 import { createClient } from "../utils/server";
 import { cookies } from "next/headers";
+import { sendMail } from "../email";
+import path from "path";
 
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
@@ -655,4 +657,52 @@ export async function getTenders(searchParams?: {
 
     return { tenders, page, totalPages, limit };
   }
+}
+
+export async function updateTender(
+  where: Prisma.TenderWhereInput,
+  data: Prisma.TenderUpdateInput
+) {
+  const tender = await prisma.tender.findFirstOrThrow({
+    where,
+    select: {
+      id: true,
+      followedBy: {
+        select: { id: true, email: true, name: true },
+        where: { UserPreferences: { emailNotification: true } },
+      },
+      globalUpdateDate: true,
+      updateDate: true,
+    },
+  });
+
+  if (
+    data.globalUpdateDate &&
+    (typeof data.globalUpdateDate === "string" ||
+      data.globalUpdateDate instanceof Date) &&
+    tender.globalUpdateDate.getTime() !==
+      new Date(data.globalUpdateDate).getTime()
+  ) {
+    const updatedTender = await prisma.tender.update({
+      where: { id: tender.id },
+      data,
+    });
+
+    for (const user of tender.followedBy) {
+      await sendMail({
+        to: user.email,
+        subject: `Atualização da licitação ${updatedTender.purchaseNumber}/${updatedTender.purchaseYear}`,
+        template: "update-tender",
+        context: {
+          ...updatedTender,
+          userName: user.name,
+          id: updatedTender.id,
+        },
+      });
+    }
+
+    return updatedTender;
+  }
+
+  return null;
 }

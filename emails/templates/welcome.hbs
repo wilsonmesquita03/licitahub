@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bem-vindo ao LicitaHub</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f7f7f7;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 20px;
+        background-color: #0070f3;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+      .footer {
+        margin-top: 40px;
+        font-size: 12px;
+        color: #999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Olá, {{name}}!</h1>
+      <p>
+        Seja muito bem-vindo ao <strong>LicitaHub</strong>! Estamos felizes em ter você conosco.
+      </p>
+      <p>
+        Agora você pode acompanhar licitações, receber atualizações e aproveitar ao máximo todas as funcionalidades da plataforma.
+      </p>
+
+      <a class="button" href="{{appUrl}}">Acessar minha conta</a>
+
+      <p class="footer">
+        Caso tenha qualquer dúvida, entre em contato conosco.<br />
+        Equipe LicitaHub.
+      </p>
+    </div>
+  </body>
+</html>

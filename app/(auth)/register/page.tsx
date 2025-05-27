@@ -10,9 +10,10 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { signup } from "../actions";
 import { useActionState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
-  const [state, formAction, pending] = useActionState(signup, null);
+  const [state, formAction, isPending] = useActionState(signup, null);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -44,8 +45,8 @@ export default function RegisterPage() {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Cadastrando..." : "Cadastrar"}
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending ? <Loader2 className="animate-spin" /> : "Criar conta"}
           </Button>
         </form>
 
