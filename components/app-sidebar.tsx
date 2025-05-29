@@ -24,6 +24,7 @@ import { useSession } from "@/app/session-provider";
 import { usePathname } from "next/navigation";
 import { SidebarHistory } from "./chat/sidebar-history";
 import { LoginRequiredModal } from "./auth-required";
+import { NavUser } from "./nav-user";
 
 // Menu items.
 const items = [
@@ -98,13 +99,13 @@ export function AppSidebar() {
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link href="/signout">Sair</Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
+                <NavUser
+                  user={{
+                    name: session.user.name || "",
+                    email: session.user.email,
+                    picture: session.user.picture,
+                  }}
+                />
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>

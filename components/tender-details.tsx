@@ -12,10 +12,15 @@ import {
   Clock,
   ChevronUp,
   ChevronDown,
+  ClipboardListIcon,
+  ClipboardList,
 } from "lucide-react";
 import { CostEstimate } from "./cost-estimate";
 import { Tender, UnidadeOrgao, OrgaoEntidade } from "@prisma/client";
-import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
+import {
+  toggleFollowAction,
+  toggleJoinAction,
+} from "@/app/(dashboard)/opportunities/actions";
 import { useSession } from "@/app/session-provider";
 import { useRouter } from "next/navigation";
 import { LoginRequiredModal } from "./auth-required";
@@ -41,14 +46,21 @@ interface TenderDetailsProps {
     orgaoEntidade: OrgaoEntidade;
   };
   files: DocumentoPncp[];
+  defaultIsJoined: boolean;
 }
 
-export function TenderDetails({ tender, files }: TenderDetailsProps) {
+export function TenderDetails({
+  tender,
+  files,
+  defaultIsJoined,
+}: TenderDetailsProps) {
   const router = useRouter();
   const { user } = useSession();
   const [isFollowed, setIsFollowed] = useState(
     !!user?.followedTenders.find((t) => t.id === tender.id)
   );
+  const [isJoined, setIsJoined] = useState(defaultIsJoined);
+
   const [showAll, setShowAll] = useState(false);
 
   const statusColors = {
@@ -62,6 +74,20 @@ export function TenderDetails({ tender, files }: TenderDetailsProps) {
     setIsFollowed(!isFollowed);
   };
 
+  const toggleJoin = async () => {
+    if (isJoined) {
+      await toggleJoinAction(tender.id, false);
+      setIsJoined(false);
+    } else {
+      await toggleJoinAction(tender.id, true);
+      if (!isFollowed) {
+        await toggleFollowAction(tender.id, false);
+        setIsFollowed(true);
+      }
+      setIsJoined(true);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -73,20 +99,37 @@ export function TenderDetails({ tender, files }: TenderDetailsProps) {
           <ArrowLeft className="h-4 w-4" />
           Voltar
         </Button>
-        <LoginRequiredModal>
-          <Button
-            onClick={toggleFollow}
-            variant={isFollowed ? "default" : "outline"}
-            className="gap-2"
-          >
-            {isFollowed ? (
-              <StarIcon className="h-4 w-4 fill-current" />
-            ) : (
-              <Star className="h-4 w-4" />
-            )}
-            {isFollowed ? "Seguindo" : "Seguir Licitação"}
-          </Button>
-        </LoginRequiredModal>
+        <div className="flex gap-4">
+          <LoginRequiredModal>
+            <Button
+              onClick={toggleJoin}
+              variant={isJoined ? "default" : "outline"}
+              className="gap-2"
+            >
+              {isJoined ? (
+                <ClipboardListIcon className="h-4 w-4 fill-current" />
+              ) : (
+                <ClipboardList className="h-4 w-4" />
+              )}
+              {isJoined ? "Participando" : "Participar da licitação"}
+            </Button>
+          </LoginRequiredModal>
+          <LoginRequiredModal>
+            <Button
+              onClick={toggleFollow}
+              variant={isFollowed ? "default" : "outline"}
+              className="gap-2"
+              disabled={isJoined}
+            >
+              {isFollowed ? (
+                <StarIcon className="h-4 w-4 fill-current" />
+              ) : (
+                <Star className="h-4 w-4" />
+              )}
+              {isFollowed ? "Seguindo" : "Seguir Licitação"}
+            </Button>
+          </LoginRequiredModal>
+        </div>
       </div>
 
       <div className="space-y-2">

@@ -15,16 +15,20 @@ model User {
   password  String // Hash
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  googleId  String?
+  picture   String?
 
   costItems          CostItem[]
   createdTenders     Tender[]             @relation("CreatedTenders")
   followedTenders    Tender[]             @relation("FollowedTenders")
+  joinedTenders      Tender[]             @relation("JoinedTenders")
   Chat               Chat[]
   Document           Document[]
   Suggestion         Suggestion[]
   Assistant          Assistant[]
   OnboardingResponse OnboardingResponse[]
   UserPreferences    UserPreferences?
+  Tender             Tender[]
 }
 
 model Tender {
@@ -70,11 +74,14 @@ model Tender {
   creatorId String?
 
   followedBy User[] @relation("FollowedTenders")
+  joinedBy   User[] @relation("JoinedTenders")
 
   search_vector Unsupported("tsvector")?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 }
 
 model OrgaoEntidade {

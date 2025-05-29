@@ -1,21 +1,20 @@
-"use server";
-
-import { cookies } from "next/headers"; // ou 'next/headers' se estiver no App Router
+import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
-import { Session } from "@/app/session-provider";
+import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 const JWT_SECRET = process.env.JWT_SECRET || "sua_chave_super_secreta";
 
-export async function getSession(): Promise<Session> {
+export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("@licitahub:auth_token")?.value;
 
   if (!token)
-    return {
+    return NextResponse.json({
       status: "unauthenticated",
       user: null,
-    };
+    });
 
   try {
     // Decodifica o token
@@ -24,10 +23,10 @@ export async function getSession(): Promise<Session> {
     if (!decoded?.sub) {
       cookieStore.delete("@licitahub:auth_token");
 
-      return {
+      return NextResponse.json({
         status: "unauthenticated",
         user: null,
-      };
+      });
     }
 
     // Busca o usuário com base no ID (sub)
@@ -49,20 +48,21 @@ export async function getSession(): Promise<Session> {
     });
 
     if (!user)
-      return {
+      return NextResponse.json({
         status: "unauthenticated",
         user: null,
-      };
+      });
 
-    return {
+    return NextResponse.json({
       status: "authenticated",
       user,
-    };
+    });
   } catch (error) {
     console.error("Erro ao verificar token:", error);
-    return {
+
+    return NextResponse.json({
       status: "unauthenticated",
       user: null,
-    };
+    });
   }
 }

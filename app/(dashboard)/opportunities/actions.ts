@@ -25,6 +25,24 @@ export async function toggleFollowAction(
   });
 }
 
+export async function toggleJoinAction(tenderId: string, isJoined: boolean) {
+  const session = await getSession();
+
+  if (!session.user) return;
+
+  await prisma.tender.update({
+    where: {
+      id: tenderId,
+    },
+    data: {
+      joinedBy: {
+        connect: isJoined ? { id: session.user.id } : [],
+        disconnect: isJoined ? [] : { id: session.user.id } ,
+      },
+    },
+  });
+}
+
 export async function addCostAction(
   tenderId: string,
   cost: {

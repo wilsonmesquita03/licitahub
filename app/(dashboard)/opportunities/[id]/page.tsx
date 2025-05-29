@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import axios from "axios";
 import { Compra } from "@/app/api/tender-by-publish/route";
 import { updateTender } from "@/lib/db/queries";
+import { getSession } from "@/lib/session";
 
 interface PageProps {
   params: Promise<{
@@ -30,9 +31,16 @@ type DocumentoPncp = {
 async function getTender(id: string) {
   "use server";
 
+  const session = await getSession();
+
   const include: Prisma.TenderInclude = {
     unidadeOrgao: true,
     orgaoEntidade: true,
+    joinedBy: {
+      where: {
+        id: session.user?.id,
+      },
+    },
   };
 
   const tender = await prisma.tender.findUnique({
@@ -112,7 +120,11 @@ export default async function TenderPage({ params }: PageProps) {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <TenderDetails tender={tender} files={files} />
+      <TenderDetails
+        tender={tender}
+        files={files}
+        defaultIsJoined={tender.joinedBy.length > 0}
+      />
     </div>
   );
 }

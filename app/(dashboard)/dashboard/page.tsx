@@ -66,6 +66,28 @@ export default async function Dashboard() {
     },
   });
 
+  const joinedTenders = await prisma.tender.findMany({
+    where: {
+      joinedBy: {
+        some: {
+          id: session.user.id,
+        },
+      },
+    },
+    select: {
+      id: true,
+      purchaseObject: true,
+      orgaoEntidade: {
+        select: {
+          companyName: true,
+        },
+      },
+      estimatedTotalValue: true,
+      proposalClosingDate: true,
+      process: true,
+    },
+  });
+
   const importantDeadlines = tenderFavorited
     .filter((tender) => tender.proposalClosingDate !== null)
     .filter((tender) => {
@@ -148,29 +170,28 @@ export default async function Dashboard() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Propostas em Construção
+                  Editais em participação
                 </CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <FileSearch className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">3</div>
-                <p className="text-xs text-muted-foreground">
-                  1 com prazo próximo
-                </p>
+                <div className="text-2xl font-bold">{joinedTenders.length}</div>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Taxa de Sucesso
-                </CardTitle>
-                <Bell className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">67%</div>
-                <p className="text-xs text-muted-foreground">+5% este mês</p>
-              </CardContent>
-            </Card>
+            {/*
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Taxa de Sucesso
+                  </CardTitle>
+                  <Bell className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">67%</div>
+                  <p className="text-xs text-muted-foreground">+5% este mês</p>
+                </CardContent>
+              </Card>
+              */}
           </div>
 
           {/* Alerts */}
@@ -208,11 +229,13 @@ export default async function Dashboard() {
           {/* Recent Activities */}
           <Tabs defaultValue="opportunities" className="space-y-4">
             <TabsList className="grid w-full h-fit grid-cols-1 md:grid-cols-3">
+              <TabsTrigger value="analysis">Análises Recentes</TabsTrigger>
               <TabsTrigger value="opportunities">
                 Oportunidades Recentes
               </TabsTrigger>
-              <TabsTrigger value="analysis">Análises Recentes</TabsTrigger>
-              <TabsTrigger value="proposals">Propostas Recentes</TabsTrigger>
+              <TabsTrigger value="joinedTenders">
+                Editais em participação
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="opportunities" className="space-y-4">
               <Card>
@@ -285,31 +308,41 @@ export default async function Dashboard() {
                 </CardContent>
               </Card>
             </TabsContent>
-            <TabsContent value="proposals" className="space-y-4">
+            <TabsContent value="joinedTenders" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Propostas em Elaboração</CardTitle>
-                  <CardDescription>
-                    Últimas propostas trabalhadas
-                  </CardDescription>
+                  <CardTitle>Editais em Participação</CardTitle>
+                  <CardDescription>Licitações em participação</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {[1, 2].map((i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between p-4 border rounded-lg"
+                    {joinedTenders.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        Você não está participando de nenhum edital.
+                      </p>
+                    )}
+                    {joinedTenders.map((opportunity) => (
+                      <Link
+                        key={opportunity.id}
+                        href={`/opportunities/${opportunity.id}`}
                       >
-                        <div>
-                          <h3 className="font-medium">
-                            Proposta Técnica - DNIT
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            Última atualização há 2 horas
-                          </p>
+                        <div className="flex items-center justify-between gap-4 p-4 border rounded-lg">
+                          <div>
+                            <h3 className="font-medium">
+                              {opportunity.orgaoEntidade.companyName}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {opportunity.purchaseObject}
+                            </p>
+                          </div>
+                          <Badge>
+                            {opportunity.estimatedTotalValue.toLocaleString(
+                              "pt-BR",
+                              { style: "currency", currency: "BRL" }
+                            )}
+                          </Badge>
                         </div>
-                        <Badge variant="outline">Rascunho</Badge>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </CardContent>
