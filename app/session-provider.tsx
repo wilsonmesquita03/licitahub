@@ -17,7 +17,7 @@ export interface SessionAuthenticated {
     followedTenders: { id: string }[];
   };
   status: "authenticated";
-  logout: () => Promise<void>;
+  logout?: () => Promise<void>;
 }
 
 export interface SessionUnauthenticated {
