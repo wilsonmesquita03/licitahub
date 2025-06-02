@@ -46,13 +46,13 @@ export function buildCompanyInfoPrompt(data: OnboardingFormData): string {
 }
 
 import {
-  generateText,
   type CoreAssistantMessage,
   type CoreToolMessage,
   type UIMessage,
 } from "ai";
 import { Document } from "@prisma/client";
-import { openai } from "@ai-sdk/openai";
+import { ProposalData } from "@/types/proposal";
+import { TDocumentDefinitions } from "pdfmake/interfaces";
 
 interface ApplicationError extends Error {
   info: string;
@@ -123,4 +123,142 @@ export function getTrailingMessageId({
 
 export function sanitizeText(text: string) {
   return text.replace("<has_function_call>", "");
+}
+
+export function generateProposalDoc(data: ProposalData): TDocumentDefinitions {
+  const {
+    letterhead,
+    biddingNumber,
+    company,
+    representative,
+    items,
+    validity,
+    locationAndDate,
+  } = data;
+
+  const tableBody = [
+    [
+      { text: "Item", bold: true },
+      { text: "Descrição", bold: true },
+      { text: "Unidade", bold: true },
+      { text: "Qtd.", bold: true },
+      { text: "Valor Unitário (R$)", bold: true },
+      { text: "Valor Total (R$)", bold: true },
+    ],
+    ...items.map((item, index) => [
+      String(index + 1).padStart(2, "0"),
+      item.description,
+      item.unity,
+      String(item.quantity),
+      item.unitPrice.toFixed(2).replace(".", ","),
+      item.totalPrice,
+    ]),
+  ];
+
+  return {
+    content: [
+      {
+        text: letterhead || "(EM TIMBRADO)",
+        style: "header",
+        alignment: "center",
+        margin: [0, 0, 0, 10],
+      },
+      {
+        text: "PROPOSTA DE PREÇO",
+        style: "title",
+        alignment: "center",
+        margin: [0, 0, 0, 10],
+      },
+      {
+        text: `PREGÃO ELETRÔNICO Nº ${biddingNumber}`,
+        alignment: "center",
+        margin: [0, 0, 0, 20],
+      },
+
+      { text: "DADOS DA EMPRESA (PROPONENTE)", style: "sectionHeader" },
+      {
+        ul: [
+          `Razão Social: ${company.companyName}`,
+          `CNPJ nº: ${company.cnpj}`,
+          `Inscrição Estadual: ${company.stateRegistration}`,
+          `Endereço: ${company.address}`,
+          `E-mail: ${company.email}`,
+          `Telefone: ${company.phone}`,
+          `Dados Bancários: ${company.bankDetails}`,
+        ],
+      },
+
+      { text: "\nDADOS DO REPRESENTANTE LEGAL", style: "sectionHeader" },
+      {
+        ul: [
+          `Nome: ${representative.name}`,
+          `Nacionalidade: ${representative.nationality}`,
+          `Naturalidade: ${representative.birthPlace}`,
+          `Estado Civil: ${representative.maritalStatus}`,
+          `Profissão: ${representative.occupation}`,
+          `CPF nº: ${representative.cpf}`,
+          `R.G nº: ${representative.rg}`,
+          `Órgão Expedidor: ${representative.rgIssuer}`,
+          `Endereço: ${representative.address}`,
+          `E-mail: ${representative.email}`,
+          `Telefone: ${representative.phone}`,
+        ],
+      },
+
+      {
+        text:
+          "\nA empresa acima identificada, após tomar conhecimento de todas as condições estabelecidas no Termo de Referência, no Edital nº " +
+          biddingNumber +
+          " (e anexos), por seu representante legal, abaixo assinado, apresenta a seguinte proposta de preços:\n",
+        margin: [0, 10, 0, 10],
+      },
+
+      {
+        table: {
+          widths: ["auto", "*", "auto", "auto", "auto", "auto"],
+          body: tableBody,
+        },
+        layout: "lightHorizontalLines",
+        margin: [0, 0, 0, 20],
+      },
+
+      {
+        text: `Validade da Proposta: ${validity}`,
+        margin: [0, 0, 0, 10],
+      },
+
+      {
+        text: `Declaramos que no preço proposto estão inclusos todos os custos necessários para o fornecimento do objeto, como todas as despesas com a mão de obra a ser utilizada, bem como todos os tributos, encargos trabalhistas, comerciais e quaisquer outras despesas que incidam ou venham a incidir sobre o objeto desta licitação, e que influenciem na formação dos preços desta Proposta.\n\nDeclaramos, ainda, conhecer a legislação de regência desta licitação e que o objeto será fornecido de acordo com as condições estabelecidas neste Edital e seus anexos, que conhecemos e aceitamos em todos os seus termos.`,
+        margin: [0, 0, 0, 20],
+      },
+
+      {
+        text: `${locationAndDate}\n\n`,
+        margin: [0, 0, 0, 20],
+      },
+
+      {
+        columns: [
+          { width: "*", text: "" },
+          {
+            width: "auto",
+            stack: [
+              {
+                text: "_______________________________________",
+                alignment: "center",
+              },
+              { text: "Representante Legal", alignment: "center" },
+            ],
+          },
+          { width: "*", text: "" },
+        ],
+      },
+    ],
+
+    styles: {
+      header: { fontSize: 10, italics: true },
+      title: { fontSize: 14, bold: true },
+      sectionHeader: { fontSize: 12, bold: true, margin: [0, 10, 0, 5] },
+    },
+  };
 }

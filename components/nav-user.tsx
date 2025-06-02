@@ -31,6 +31,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { SessionAuthenticated, useSession } from "@/app/session-provider";
+import Link from "next/link";
 
 export function NavUser({
   user,
@@ -92,23 +93,25 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserCircleIcon className="mr-2 w-4 h-4" />
-                Account
-              </DropdownMenuItem>
+              <Link href="/settings">
+                <DropdownMenuItem>
+                  <UserCircleIcon className="mr-2 w-4 h-4" />
+                  Sua conta
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>
                 <CreditCardIcon className="mr-2 w-4 h-4" />
-                Billing
+                Cobranças
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <BellIcon className="mr-2 w-4 h-4" />
-                Notifications
+                Notificações
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={async () => logout && (await logout())}>
               <LogOutIcon className="mr-2 w-4 h-4" />
-              Log out
+              Sair
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

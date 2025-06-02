@@ -128,7 +128,7 @@ export async function POST(request: Request) {
         chatId: id,
       },
       orderBy: {
-        createdAt: "asc",
+        createdAt: "desc",
       },
     });
 

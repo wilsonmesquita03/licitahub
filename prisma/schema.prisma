@@ -78,10 +78,11 @@ model Tender {
 
   search_vector Unsupported("tsvector")?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User?    @relation(fields: [userId], references: [id])
-  userId    String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  User             User?             @relation(fields: [userId], references: [id])
+  userId           String?
+  ProposalTemplate ProposalTemplate?
 }
 
 model OrgaoEntidade {
@@ -290,4 +291,27 @@ model UserPreferences {
   navigatorNotification Boolean @default(true)
   User                  User    @relation(fields: [userId], references: [id])
   userId                String  @unique
+}
+
+model ProposalTemplate {
+  id        String   @id @default(cuid())
+  title     String // Ex: "Pregão Eletrônico nº 22/2025"
+  edital    Tender   @relation(fields: [tenderId], references: [id])
+  campos    Json // Campos esperados para preencher (nome, tipo, label, etc)
+  template  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  proposals Proposal[]
+  tenderId  String     @unique
+}
+
+model Proposal {
+  id         String           @id @default(cuid())
+  templateId String
+  template   ProposalTemplate @relation(fields: [templateId], references: [id])
+  userId     String // ou email do usuário logado
+  dados      Json // Respostas do usuário
+  pdfUrl     String? // (opcional) link para PDF gerado, caso salve no S3
+  createdAt  DateTime         @default(now())
 }
