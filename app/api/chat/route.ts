@@ -20,7 +20,6 @@ import {
   type ResumableStreamContext,
 } from "resumable-stream";
 import { after } from "next/server";
-import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateTitleFromUserMessage } from "@/app/(dashboard)/analyzer/actions";
 import { differenceInSeconds } from "date-fns";
@@ -32,6 +31,8 @@ import {
   getStreamIdsByChatId,
 } from "@/lib/db/queries";
 import { checkIfRelatedToFile } from "@/lib/utils/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export const maxDuration = 60;
 
@@ -72,7 +73,9 @@ export async function POST(request: Request) {
 
     const selectedChatModel = "chat-model";
 
-    const session = await getSession();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
     if (!session?.user) {
       return new Response("Unauthorized", { status: 401 });
@@ -209,10 +212,16 @@ export async function POST(request: Request) {
           experimental_generateMessageId: generateUUID,
           tools: {
             getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
+            createDocument: createDocument({
+              session: session.session,
+              dataStream,
+            }),
+            updateDocument: updateDocument({
+              session: session.session,
+              dataStream,
+            }),
             requestSuggestions: requestSuggestions({
-              session,
+              session: session.session,
               dataStream,
             }),
           },
@@ -304,7 +313,9 @@ export async function GET(request: Request) {
     return new Response("id is required", { status: 400 });
   }
 
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session?.user) {
     return new Response("Unauthorized", { status: 401 });
@@ -392,7 +403,9 @@ export async function DELETE(request: Request) {
     return new Response("Not Found", { status: 404 });
   }
 
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });

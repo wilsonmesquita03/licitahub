@@ -2,16 +2,18 @@
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 import { OnboardingFormData } from "./onboarding-provider";
-import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { buildCompanyInfoPrompt } from "@/lib/utils";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export async function finishOnboard(OnboardingFormData: OnboardingFormData) {
-  const session = await getSession();
-
-  if (!session.user) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session?.user) {
     redirect("/login");
   }
 

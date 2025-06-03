@@ -58,6 +58,7 @@ export async function signup(prevState: any, formData: FormData) {
       name,
       email,
       password: hashedPassword,
+      emailVerified: false,
     },
   });
 

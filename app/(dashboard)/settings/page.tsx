@@ -1,16 +1,14 @@
-// app/settings/page.tsx (ou onde estiver sua rota)
-
 import { EditResponseDialog } from "@/components/edit-onboarding";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
 import Keywords from "./keywords";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export default async function SettingsPage() {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session?.user) {
     return (

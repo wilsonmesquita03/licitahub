@@ -1,10 +1,11 @@
 import type { ArtifactKind } from "@/components/chat/artifact";
+import { auth } from "@/lib/auth";
 import {
   deleteDocumentsByIdAfterTimestamp,
   getDocumentsById,
   saveDocument,
 } from "@/lib/db/queries";
-import { getSession } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,7 +15,9 @@ export async function GET(request: Request) {
     return new Response("Missing id", { status: 400 });
   }
 
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
@@ -43,8 +46,9 @@ export async function POST(request: Request) {
     return new Response("Missing id", { status: 400 });
   }
 
-  const session = await getSession();
-
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
   }
@@ -90,7 +94,9 @@ export async function DELETE(request: Request) {
     return new Response("Missing timestamp", { status: 400 });
   }
 
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });

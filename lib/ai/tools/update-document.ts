@@ -1,8 +1,8 @@
 import { DataStreamWriter, tool } from 'ai';
-import { Session } from '@/app/session-provider';
 import { z } from 'zod';
 import { getDocumentById, saveDocument } from '@/lib/db/queries';
 import { documentHandlersByArtifactKind } from '@/lib/artifacts/server';
+import { Session } from 'better-auth';
 
 interface UpdateDocumentProps {
   session: Session;

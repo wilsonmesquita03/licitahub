@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 
 import { CheckCircleFillIcon, ChevronDownIcon } from "./icons";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
-import { Session } from "@/app/session-provider";
 import { saveChatModelAsCookie } from "@/app/(dashboard)/analyzer/actions";
+import { Session } from "better-auth";
 
 export function ModelSelector({
   session,
