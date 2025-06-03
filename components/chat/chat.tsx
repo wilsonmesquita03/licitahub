@@ -19,7 +19,6 @@ import { useSearchParams } from "next/navigation";
 import { useChatVisibility } from "@/hooks/use-chat-visibility";
 import { useAutoResume } from "@/hooks/use-auto-resume";
 import { Vote } from "@/prisma/generated/prisma";
-import { Session } from "@/app/session-provider";
 
 export function Chat({
   id,

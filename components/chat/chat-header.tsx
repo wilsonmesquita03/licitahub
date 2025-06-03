@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { type VisibilityType } from "./visibility-selector";
-import { Session } from "@/app/session-provider";
+import { Session } from "better-auth"
 
 function PureChatHeader({
   chatId,
