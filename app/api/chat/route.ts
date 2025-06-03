@@ -20,7 +20,7 @@ import {
   type ResumableStreamContext,
 } from "resumable-stream";
 import { after } from "next/server";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateTitleFromUserMessage } from "@/app/(dashboard)/analyzer/actions";
 import { differenceInSeconds } from "date-fns";

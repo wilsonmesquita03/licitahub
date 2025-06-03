@@ -9,17 +9,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Bell, FileSearch, FileText, Search } from "lucide-react";
-import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { differenceInDays, differenceInHours } from "date-fns";
 import NotificationPopover from "@/components/notifiction-popover";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export default async function Dashboard() {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  });
 
-  if (!session.user) {
+  if (!session?.user) {
     redirect("/opportunities");
   }
 

@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
 import { TenderDetails } from "@/components/tender-details";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 import axios from "axios";
 import { Compra } from "@/app/api/tender-by-publish/route";
 import { updateTender } from "@/lib/db/queries";
-import { getSession } from "@/lib/session";
+import { Prisma } from "@/prisma/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 interface PageProps {
   params: Promise<{
@@ -31,14 +32,16 @@ type DocumentoPncp = {
 async function getTender(id: string) {
   "use server";
 
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   const include: Prisma.TenderInclude = {
     unidadeOrgao: true,
     orgaoEntidade: true,
     joinedBy: {
       where: {
-        id: session.user?.id,
+        id: session?.user?.id,
       },
     },
   };

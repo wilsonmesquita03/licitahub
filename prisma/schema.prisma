@@ -1,5 +1,7 @@
+
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/prisma"
 }
 
 datasource db {
@@ -12,7 +14,7 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
-  password  String // Hash
+  password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   googleId  String?
@@ -29,6 +31,12 @@ model User {
   OnboardingResponse OnboardingResponse[]
   UserPreferences    UserPreferences?
   Tender             Tender[]
+  emailVerified      Boolean
+  image              String?
+  sessions           Session[]
+  accounts           Account[]
+
+  @@map("user")
 }
 
 model Tender {
@@ -314,4 +322,49 @@ model Proposal {
   dados      Json // Respostas do usuário
   pdfUrl     String? // (opcional) link para PDF gerado, caso salve no S3
   createdAt  DateTime         @default(now())
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }

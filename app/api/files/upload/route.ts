@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/session";
+import { getSession } from "@/lib/auth";
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { z } from "zod";

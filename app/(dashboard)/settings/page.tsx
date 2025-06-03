@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/lib/auth";
 import Keywords from "./keywords";
 
 export default async function SettingsPage() {

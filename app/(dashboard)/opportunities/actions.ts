@@ -1,16 +1,19 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function toggleFollowAction(
   tenderId: string,
   isFollowed: boolean
 ) {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!session.user) return;
+  if (!session?.user) return;
 
   await prisma.tender.update({
     where: {
@@ -26,9 +29,11 @@ export async function toggleFollowAction(
 }
 
 export async function toggleJoinAction(tenderId: string, isJoined: boolean) {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!session.user) return;
+  if (!session?.user) return;
 
   await prisma.tender.update({
     where: {
@@ -37,7 +42,7 @@ export async function toggleJoinAction(tenderId: string, isJoined: boolean) {
     data: {
       joinedBy: {
         connect: isJoined ? { id: session.user.id } : [],
-        disconnect: isJoined ? [] : { id: session.user.id } ,
+        disconnect: isJoined ? [] : { id: session.user.id },
       },
     },
   });
@@ -52,7 +57,9 @@ export async function addCostAction(
     type: "FIXED" | "VARIABLE";
   }
 ) {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session?.user) {
     redirect("/login");

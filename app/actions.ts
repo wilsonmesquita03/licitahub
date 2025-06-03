@@ -1,8 +1,9 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
 import { CostItem } from "@prisma/client";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { OpenAI } from "openai";
@@ -11,9 +12,11 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export async function analyzePdf(file: File) {
   if (!file) throw new Error("Arquivo não encontrado");
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!session.user) throw new Error("Usuário não autenticado");
+  if (!session?.user) throw new Error("Usuário não autenticado");
 
   const assistant = await prisma.assistant.findFirst({
     where: {

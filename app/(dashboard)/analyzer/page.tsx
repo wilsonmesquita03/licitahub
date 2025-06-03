@@ -1,15 +1,17 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { Chat } from "@/components/chat/chat";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import { generateUUID } from "@/lib/utils";
 import { DataStreamHandler } from "@/components/chat/data-stream-handler";
-import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 export default async function Page() {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!session.user) {
+  if (!session?.user) {
     redirect("/login");
   }
 

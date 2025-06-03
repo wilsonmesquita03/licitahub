@@ -1,5 +1,5 @@
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
 import { NextRequest } from "next/server";
 
 export async function GET(
@@ -10,7 +10,9 @@ export async function GET(
     params: Promise<{ id: string }>;
   }
 ) {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
 
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });

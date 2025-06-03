@@ -1,6 +1,6 @@
 import "server-only";
 
-import { type User, type Suggestion, Prisma } from "@prisma/client";
+import { type User, type Suggestion, Prisma } from "@/prisma/generated/prisma";
 import type { ArtifactKind } from "@/components/chat/artifact";
 import { generateUUID } from "../utils";
 import { generateHashedPassword } from "./utils";
@@ -9,7 +9,6 @@ import { prisma } from "../prisma";
 import { createClient } from "../utils/server";
 import { cookies } from "next/headers";
 import { sendMail } from "../email";
-import path from "path";
 
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
@@ -34,6 +33,7 @@ export async function createUser(email: string, password: string) {
       data: {
         email,
         password: hashedPassword,
+        emailVerified: false,
       },
     });
   } catch (error) {
@@ -51,6 +51,7 @@ export async function createGuestUser() {
       data: {
         email,
         password,
+        emailVerified: false,
       },
       select: {
         id: true,

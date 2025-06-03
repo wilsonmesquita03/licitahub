@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 import { OnboardingFormData } from "./onboarding-provider";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { buildCompanyInfoPrompt } from "@/lib/utils";
 

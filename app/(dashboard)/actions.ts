@@ -1,12 +1,15 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
+import { headers } from "next/headers";
 
 export async function toggleNotificationAction(enabled: boolean) {
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  });
 
-  if (!session.user) return;
+  if (!session?.user) return;
 
   await prisma.userPreferences.upsert({
     where: {

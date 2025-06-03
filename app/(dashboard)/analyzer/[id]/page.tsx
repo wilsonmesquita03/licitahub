@@ -1,12 +1,12 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { Chat } from "@/components/chat/chat";
 import type { Attachment, UIMessage } from "ai";
-import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { Message } from "@prisma/client";
 import { DataStreamHandler } from "@/components/chat/data-stream-handler";
 import { DEFAULT_CHAT_MODEL } from "@/lib/models";
+import { auth } from "@/lib/auth";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -17,9 +17,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     return notFound();
   }
 
-  const session = await getSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!session.user) {
+  if (!session?.user) {
     redirect("/login");
   }
 

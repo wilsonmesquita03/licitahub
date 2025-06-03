@@ -4,6 +4,7 @@ import {
   FileSearch,
   FileText,
   LayoutDashboard,
+  Loader2,
   Search,
   User2,
 } from "lucide-react";
@@ -20,17 +21,17 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { useSession } from "@/app/session-provider";
 import { usePathname } from "next/navigation";
 import { SidebarHistory } from "./chat/sidebar-history";
 import { LoginRequiredModal } from "./auth-required";
 import { NavUser } from "./nav-user";
+import { authClient } from "@/lib/auth-client";
 
 // Menu items.
 const items = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: LayoutDashboard,
     auth: true,
   },
@@ -53,7 +54,7 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const session = useSession();
+  const session = authClient.useSession();
   const pathname = usePathname();
 
   return (
@@ -65,7 +66,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  {item.auth && !session.user ? (
+                  {item.auth && !session?.data?.user ? (
                     <LoginRequiredModal>
                       <SidebarMenuButton>
                         <item.icon />
@@ -85,32 +86,47 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {pathname.includes("/analyzer") && session?.user && (
+        {pathname.includes("/analyzer") && session?.data?.user && (
           <SidebarGroup>
             <SidebarGroupLabel>Analises anteriores</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarHistory user={session.user} />
+              <SidebarHistory user={session?.data.user} />
             </SidebarGroupContent>
           </SidebarGroup>
         )}
       </SidebarContent>
       <SidebarFooter className="dark:bg-black">
-        {session.user && (
+        {session?.data?.user && (
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupContent>
                 <NavUser
                   user={{
-                    name: session.user.name || "",
-                    email: session.user.email,
-                    picture: session.user.picture,
+                    name: session.data?.user.name || "",
+                    email: session.data?.user.email,
+                    picture: session.data?.user.image || null,
                   }}
                 />
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
         )}
-        {session.status === "unauthenticated" && (
+        {session.isPending && (
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>
+                      <Loader2 className="animate-spin" />
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        )}
+        {!session.data?.user && !session.isPending && (
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupContent>

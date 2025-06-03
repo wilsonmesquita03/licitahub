@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Star, StarIcon } from "lucide-react";
 import Link from "next/link";
 import { Tender } from "@prisma/client";
-import { useSession } from "@/app/session-provider";
 import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
+import { authClient } from "@/lib/auth-client";
 
 interface TenderCardProps {
   tender: Tender & {
@@ -23,7 +23,10 @@ interface TenderCardProps {
 }
 
 export function TenderCard({ tender }: TenderCardProps) {
-  const { user } = useSession();
+  const { data } = authClient.useSession();
+
+  const user = data?.user;
+
   const [isFollowed, setIsFollowed] = useState(
     user ? !!user.followedTenders.find((t) => t.id === tender.id) : false
   );

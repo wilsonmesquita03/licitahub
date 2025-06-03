@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, Children, isValidElement, cloneElement } from "react";
-import { useSession } from "@/app/session-provider";
+import { authClient } from "@/lib/auth-client";
 
 interface LoginRequiredModalProps {
   children: React.ReactNode;
 }
 
 export const LoginRequiredModal = ({ children }: LoginRequiredModalProps) => {
-  const { status } = useSession();
+  const { data } = authClient.useSession();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -28,12 +28,10 @@ export const LoginRequiredModal = ({ children }: LoginRequiredModalProps) => {
     setIsOpen(false);
   };
 
-  // Se estiver autenticado, renderiza os filhos normalmente
-  if (status === "authenticated") {
+  if (data?.user) {
     return <>{children}</>;
   }
 
-  // Se NÃO estiver autenticado
   let trigger: React.ReactNode;
 
   if (Children.count(children) === 1 && isValidElement(children)) {

@@ -30,8 +30,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { SessionAuthenticated, useSession } from "@/app/session-provider";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
@@ -43,7 +44,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
-  const { logout } = useSession() as SessionAuthenticated;
+  const router = useRouter();
 
   return (
     <SidebarMenu>
@@ -54,7 +55,7 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
+              <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user?.picture || ""} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
                   {user.name.charAt(0)}
@@ -109,7 +110,17 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={async () => logout && (await logout())}>
+            <DropdownMenuItem
+              onClick={async () => {
+                await authClient.signOut({
+                  fetchOptions: {
+                    onSuccess: () => {
+                      router.push("/login"); // redirect to login page
+                    },
+                  },
+                });
+              }}
+            >
               <LogOutIcon className="mr-2 w-4 h-4" />
               Sair
             </DropdownMenuItem>

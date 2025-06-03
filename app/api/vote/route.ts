@@ -1,5 +1,5 @@
 import { getChatById, getVotesByChatId, voteMessage } from '@/lib/db/queries';
-import { getSession } from '@/lib/session';
+import { getSession } from '@/lib/auth';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

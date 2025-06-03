@@ -21,9 +21,9 @@ import {
   toggleFollowAction,
   toggleJoinAction,
 } from "@/app/(dashboard)/opportunities/actions";
-import { useSession } from "@/app/session-provider";
 import { useRouter } from "next/navigation";
 import { LoginRequiredModal } from "./auth-required";
+import { authClient } from "@/lib/auth-client";
 
 type DocumentoPncp = {
   uri: string;
@@ -55,9 +55,9 @@ export function TenderDetails({
   defaultIsJoined,
 }: TenderDetailsProps) {
   const router = useRouter();
-  const { user } = useSession();
+  const { data } = authClient.useSession();
   const [isFollowed, setIsFollowed] = useState(
-    !!user?.followedTenders.find((t) => t.id === tender.id)
+    !!data?.user?.followedTenders.find((t) => t.id === tender.id)
   );
   const [isJoined, setIsJoined] = useState(defaultIsJoined);
 
