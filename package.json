@@ -23,7 +23,7 @@
     "@dicebear/core": "^9.2.2",
     "@hookform/resolvers": "^3.9.0",
     "@next/swc-wasm-nodejs": "13.5.1",
-    "@/prisma/generated/prisma": "^6.7.0",
+    "@prisma/client": "^6.7.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -136,5 +136,13 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/pdfmake": "^0.2.11",
     "@types/react": "19.1.3"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "@prisma/client"
+    ],
+    "onlyBuiltDependencies": [
+      "@prisma/client"
+    ]
   }
 }
