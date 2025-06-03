@@ -4,7 +4,7 @@ import { sheetDocumentHandler } from "@/artifacts/sheet/server";
 import { textDocumentHandler } from "@/artifacts/text/server";
 import { ArtifactKind } from "@/components/chat/artifact";
 import { DataStreamWriter } from "ai";
-import { Document } from "@prisma/client";
+import { Document } from "@/prisma/generated/prisma";
 import { saveDocument } from "../db/queries";
 import { Session } from "better-auth";
 

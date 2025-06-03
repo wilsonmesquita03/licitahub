@@ -1,5 +1,5 @@
 import type { ArtifactKind } from "@/components/chat/artifact";
-import { OnboardingResponse } from "@prisma/client";
+import { OnboardingResponse } from "@/prisma/generated/prisma";
 import type { Geo } from "@vercel/functions";
 
 export const artifactsPrompt = `

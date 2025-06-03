@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { DataStreamWriter, streamObject, tool } from "ai";
 import { getDocumentById, saveSuggestions } from "@/lib/db/queries";
-import { Suggestion } from "@prisma/client";
+import { Suggestion } from "@/prisma/generated/prisma";
 import { generateUUID } from "@/lib/utils";
 import { myProvider } from "../providers";
 import { Session } from "better-auth";

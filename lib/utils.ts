@@ -50,7 +50,7 @@ import {
   type CoreToolMessage,
   type UIMessage,
 } from "ai";
-import { Document } from "@prisma/client";
+import { Document } from "@/prisma/generated/prisma";
 import { ProposalData } from "@/types/proposal";
 import { TDocumentDefinitions } from "pdfmake/interfaces";
 

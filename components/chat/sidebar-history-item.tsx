@@ -1,5 +1,5 @@
 // @ts-nocheck
-import type { Chat } from "@prisma/client";
+import type { Chat } from "@/prisma/generated/prisma";
 import {
   SidebarMenuAction,
   SidebarMenuButton,

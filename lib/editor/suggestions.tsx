@@ -8,7 +8,7 @@ import {
 import { createRoot } from 'react-dom/client';
 
 import { Suggestion as PreviewSuggestion } from '@/components/chat/suggestion';
-import type { Suggestion } from '@prisma/client';
+import type { Suggestion } from '@/prisma/generated/prisma';
 import { ArtifactKind } from '@/components/chat/artifact';
 
 export interface UISuggestion extends Suggestion {

@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/popover";
 import { Bell } from "lucide-react";
 import { useState } from "react";
-import { UserPreferences } from "@prisma/client";
 import { toggleNotificationAction } from "@/app/(dashboard)/actions";
+import { UserPreferences } from "@/prisma/generated/prisma";
 
 const NotificationPopover = ({
   userPreference,

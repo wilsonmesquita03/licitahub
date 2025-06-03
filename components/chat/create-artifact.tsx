@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Suggestion } from '@prisma/client';
+import { Suggestion } from '@/prisma/generated/prisma';
 import { UseChatHelpers } from '@ai-sdk/react';
 import { ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
 import { DataStreamDelta } from './data-stream-handler';

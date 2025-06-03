@@ -47,7 +47,7 @@ importers:
       '@next/swc-wasm-nodejs':
         specifier: 13.5.1
         version: 13.5.1
-      '@prisma/client':
+      '@/prisma/generated/prisma':
         specifier: ^6.7.0
         version: 6.7.0(prisma@6.7.0(typescript@5.2.2))(typescript@5.2.2)
       '@radix-ui/react-accordion':
@@ -1163,7 +1163,7 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@prisma/client@6.7.0':
+  '@/prisma/generated/prisma@6.7.0':
     resolution: {integrity: sha512-+k61zZn1XHjbZul8q6TdQLpuI/cvyfil87zqK2zpreNIXyXtpUv3+H/oM69hcsFcZXaokHJIzPAt5Z8C8eK2QA==}
     engines: {node: '>=18.18'}
     peerDependencies:
@@ -5638,7 +5638,7 @@ snapshots:
       playwright: 1.52.0
     optional: true
 
-  '@prisma/client@6.7.0(prisma@6.7.0(typescript@5.2.2))(typescript@5.2.2)':
+  '@/prisma/generated/prisma@6.7.0(prisma@6.7.0(typescript@5.2.2))(typescript@5.2.2)':
     optionalDependencies:
       prisma: 6.7.0(typescript@5.2.2)
       typescript: 5.2.2

@@ -12,7 +12,7 @@ import {
 } from '@/components/chat/icons';
 import { toast } from 'sonner';
 import { getSuggestions } from '../actions';
-import { Suggestion } from '@prisma/client';
+import { Suggestion } from '@/prisma/generated/prisma';
 
 interface TextArtifactMetadata {
   suggestions: Array<Suggestion>;

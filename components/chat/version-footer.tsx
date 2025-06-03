@@ -12,7 +12,7 @@ import { getDocumentTimestampByIndex } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useArtifact } from '@/hooks/use-artifact';
 import { Loader2Icon as LoaderIcon } from 'lucide-react';
-import { Document } from '@prisma/client';
+import { Document } from '@/prisma/generated/prisma';
 
 interface VersionFooterProps {
   handleVersionChange: (type: 'next' | 'prev' | 'toggle' | 'latest') => void;

@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, StarIcon } from "lucide-react";
 import Link from "next/link";
-import { Tender } from "@prisma/client";
 import { toggleFollowAction } from "@/app/(dashboard)/opportunities/actions";
 import { authClient } from "@/lib/auth-client";
+import { Tender } from "@/prisma/generated/prisma";
 
 interface TenderCardProps {
   tender: Tender & {

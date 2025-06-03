@@ -7,7 +7,7 @@ import { python } from '@codemirror/lang-python';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { basicSetup } from 'codemirror';
 import React, { memo, useEffect, useRef } from 'react';
-import { Suggestion } from '@prisma/client';
+import { Suggestion } from '@/prisma/generated/prisma';
 
 type EditorProps = {
   content: string;

@@ -1,7 +1,7 @@
 "use client";
 
+import { OrgaoEntidade, Tender, UnidadeOrgao } from "@/prisma/generated/prisma";
 import { TenderCard } from "./tender-card";
-import { OrgaoEntidade, Tender, UnidadeOrgao } from "@prisma/client";
 
 interface TenderListProps {
   tenders: (Tender & {

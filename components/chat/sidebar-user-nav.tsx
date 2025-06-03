@@ -3,7 +3,7 @@
 
 import { ChevronUp } from 'lucide-react';
 import Image from 'next/image';
-import type { User } from '@prisma/client';
+import type { User } from '@/prisma/generated/prisma';
 import { useTheme } from 'next-themes';
 
 import {

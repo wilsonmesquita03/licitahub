@@ -16,7 +16,6 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { CostEstimate } from "./cost-estimate";
-import { Tender, UnidadeOrgao, OrgaoEntidade } from "@prisma/client";
 import {
   toggleFollowAction,
   toggleJoinAction,
@@ -24,6 +23,7 @@ import {
 import { useRouter } from "next/navigation";
 import { LoginRequiredModal } from "./auth-required";
 import { authClient } from "@/lib/auth-client";
+import { OrgaoEntidade, Tender, UnidadeOrgao } from "@/prisma/generated/prisma";
 
 type DocumentoPncp = {
   uri: string;

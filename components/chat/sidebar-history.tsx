@@ -3,7 +3,7 @@
 
 import { isToday, isYesterday, subMonths, subWeeks } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
-import type { User } from "@prisma/client";
+import type { User } from "@/prisma/generated/prisma";
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -23,7 +23,7 @@ import {
   SidebarMenu,
   useSidebar,
 } from "@/components/ui/sidebar";
-import type { Chat } from "@prisma/client";
+import type { Chat } from "@/prisma/generated/prisma";
 import { fetcher } from "@/lib/utils";
 import { ChatItem } from "./sidebar-history-item";
 import useSWRInfinite from "swr/infinite";

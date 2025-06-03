@@ -2,7 +2,7 @@
 import type { Message } from 'ai';
 import { useSWRConfig } from 'swr';
 import { useCopyToClipboard } from 'usehooks-ts';
-import { Vote } from '@prisma/client';
+import { Vote } from '@/prisma/generated/prisma';
 import { CopyIcon, ThumbDownIcon, ThumbUpIcon } from './icons';
 import { Button } from '@/components/ui/button';
 import {

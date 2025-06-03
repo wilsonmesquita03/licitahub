@@ -5,7 +5,7 @@ import { useChat } from '@ai-sdk/react';
 import { useEffect, useRef } from 'react';
 import { artifactDefinitions, ArtifactKind } from './artifact';
 import { initialArtifactData, useArtifact } from '@/hooks/use-artifact';
-import { Suggestion } from '@prisma/client';
+import { Suggestion } from '@/prisma/generated/prisma';
 
 export type DataStreamDelta = {
   type:

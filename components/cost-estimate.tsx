@@ -19,7 +19,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Tender } from "@prisma/client";
 import { CostItem } from "@/types/tender";
 import { Badge } from "./ui/badge";
 import { getCosts } from "@/app/actions";
@@ -29,6 +28,7 @@ import {
 } from "@/app/(dashboard)/opportunities/actions";
 import useSWR from "swr";
 import { LoginRequiredModal } from "./auth-required";
+import { Tender } from "@/prisma/generated/prisma";
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("pt-BR", {

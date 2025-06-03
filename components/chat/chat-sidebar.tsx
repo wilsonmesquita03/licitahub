@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import type { User } from '@prisma/client';
+import type { User } from '@/prisma/generated/prisma';
 import { useRouter } from 'next/navigation';
 
 import { PlusIcon } from '@/components/chat/icons';

@@ -3,10 +3,10 @@ import { notFound, redirect } from "next/navigation";
 import { Chat } from "@/components/chat/chat";
 import type { Attachment, UIMessage } from "ai";
 import { prisma } from "@/lib/prisma";
-import { Message } from "@prisma/client";
 import { DataStreamHandler } from "@/components/chat/data-stream-handler";
 import { DEFAULT_CHAT_MODEL } from "@/lib/models";
 import { auth } from "@/lib/auth";
+import { Message } from "@/prisma/generated/prisma";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;

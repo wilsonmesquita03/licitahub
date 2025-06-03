@@ -23,7 +23,6 @@ import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateTitleFromUserMessage } from "@/app/(dashboard)/analyzer/actions";
 import { differenceInSeconds } from "date-fns";
-import { Chat } from "@prisma/client";
 import {
   deleteChatById,
   getChatById,
@@ -33,6 +32,7 @@ import {
 import { checkIfRelatedToFile } from "@/lib/utils/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { Chat } from "@/prisma/generated/prisma";
 
 export const maxDuration = 60;
 

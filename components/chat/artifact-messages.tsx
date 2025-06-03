@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { PreviewMessage, ThinkingMessage } from './message';
-import type { Vote } from '@prisma/client';
 import type { UIMessage } from 'ai';
 import { memo } from 'react';
 import equal from 'fast-deep-equal';
@@ -8,6 +7,7 @@ import type { UIArtifact } from './artifact';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { useMessages } from '@/hooks/use-messages';
+import { Vote } from '@/prisma/generated/prisma';
 
 interface ArtifactMessagesProps {
   chatId: string;
