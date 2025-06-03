@@ -7,13 +7,15 @@ import nodemailer from "nodemailer";
 
 // Criação do transporter
 export const transporter = nodemailer.createTransport({
-  host: "localhost",
-  port: 1025,
-  secure: process.env.NODE_ENV === "production",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+  host: process.env.SMTP_HOST || "localhost",
+  port: parseInt(process.env.SMTP_PORT || "1025", 10),
+  secure: process.env.NODE_ENV === "production", // SSL só em produção
+  auth: process.env.SMTP_HOST
+    ? {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      }
+    : undefined, // Sem auth no MailDev ou MailHog
 });
 
 // Registra helper globalmente
