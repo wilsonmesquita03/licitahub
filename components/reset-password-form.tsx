@@ -36,12 +36,8 @@ const resetPasswordSchema = z
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-export function ResetPasswordForm({
-  className,
-}: React.ComponentPropsWithoutRef<"div">) {
+export function ResetPasswordForm({ token }: { token: string }) {
   const [isPending, setIsPending] = useState(false);
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
   const router = useRouter();
 
   const form = useForm<ResetPasswordFormData>({
@@ -99,7 +95,7 @@ export function ResetPasswordForm({
   };
 
   return (
-    <div className={cn("grid gap-6", className)}>
+    <div className={cn("grid gap-6")}>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
