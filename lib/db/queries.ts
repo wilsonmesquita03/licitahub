@@ -1,5 +1,4 @@
 import "server-only";
-
 import { type User, type Suggestion, Prisma } from "@/prisma/generated/prisma";
 import type { ArtifactKind } from "@/components/chat/artifact";
 import { generateUUID } from "../utils";

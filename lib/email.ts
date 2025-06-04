@@ -1,4 +1,3 @@
-// app/lib/email.ts
 import "server-only";
 import fs from "fs";
 import path from "path";

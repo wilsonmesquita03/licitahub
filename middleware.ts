@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
 const PUBLIC_PATHS = [
   "/",
@@ -15,7 +16,7 @@ function isPublicPath(pathname: string) {
   );
 }
 
-export default function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Permite rotas de arquivo (ex: _next, favicon.ico etc)
@@ -32,11 +33,9 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Verifica se usuário está logado
-  // Exemplo simples: busca cookie 'token' ou 'session'
-  const token = req.cookies.get("token")?.value;
+  const sessionCookie = getSessionCookie(req);
 
-  if (!token) {
+  if (!sessionCookie) {
     // Usuário não está logado, redireciona para login
     const loginUrl = new URL("/login", req.url);
     // Se quiser pode guardar a URL atual para redirecionar depois do login
