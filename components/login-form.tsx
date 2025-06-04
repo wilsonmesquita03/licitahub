@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { authClient } from "@/lib/auth-client";
-import { useToast } from "@/hooks/use-toast";
 import {
   Form,
   FormControl,
@@ -16,6 +15,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface SignIn {
   email: string;
@@ -29,7 +29,6 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [isPending, setIsPending] = useState(false);
-  const { toast } = useToast();
 
   const form = useForm<SignIn>({
     defaultValues: {
@@ -46,9 +45,8 @@ export function LoginForm({
         callbackURL,
       });
     } catch (err) {
-      toast({
-        title: "Erro ao fazer login com o Google.",
-        variant: "destructive",
+      toast.error("Algo deu errado", {
+        description: "Erro ao fazer login com o Google.",
       });
     } finally {
       setIsPending(false);
@@ -64,17 +62,13 @@ export function LoginForm({
       });
 
       if (error) {
-        toast({
-          title: "Erro ao fazer login",
+        toast.error("Erro ao fazer login", {
           description: error.message || "Verifique suas credenciais.",
-          variant: "destructive",
         });
       }
     } catch (err) {
-      toast({
-        title: "Erro inesperado",
-        description: "Tente novamente mais tarde.",
-        variant: "destructive",
+      toast.error("Erro inesperado", {
+        description: "Tente novamente mais tarde..",
       });
     } finally {
       setIsPending(false);

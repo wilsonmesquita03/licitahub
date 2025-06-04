@@ -17,8 +17,8 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const callbackURL = "/dashboard";
 
@@ -42,7 +42,6 @@ export function RegisterForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [isPending, setIsPending] = useState(false);
-  const { toast } = useToast();
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -66,29 +65,25 @@ export function RegisterForm({
         },
         {
           onSuccess: () => {
-            toast({ title: "Cadastro realizado!", variant: "default" });
+            toast.success("Cadastro realizado!", {
+              description: "Cadastro realizado!",
+            });
           },
           onError: () => {
-            toast({
-              title: "Erro ao registrar",
+            toast.error("Erro ao registrar", {
               description: "Verifique os dados e tente novamente.",
-              variant: "destructive",
             });
           },
         }
       );
       if (error) {
-        toast({
-          title: "Erro ao registrar",
+        toast.error("Erro ao registrar", {
           description: error.message || "Verifique os dados e tente novamente.",
-          variant: "destructive",
         });
       }
     } catch (err) {
-      toast({
-        title: "Erro inesperado",
+      toast("Erro inesperado", {
         description: "Tente novamente mais tarde.",
-        variant: "destructive",
       });
     } finally {
       setIsPending(false);

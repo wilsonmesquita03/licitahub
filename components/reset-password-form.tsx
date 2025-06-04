@@ -19,7 +19,7 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const resetPasswordSchema = z
   .object({
@@ -48,14 +48,10 @@ export function ResetPasswordForm({ token }: { token: string }) {
     },
   });
 
-  const { toast } = useToast();
-
   const onSubmit = async ({ password }: ResetPasswordFormData) => {
     if (!token) {
-      toast({
-        title: "Token inválido",
+      toast.error("Token inválido", {
         description: "Não foi possível identificar o reset de senha.",
-        variant: "destructive",
       });
       return;
     }
@@ -70,24 +66,19 @@ export function ResetPasswordForm({ token }: { token: string }) {
       });
 
       if (error) {
-        toast({
-          title: "Erro ao redefinir senha",
+        toast.error("Erro ao redefinir senha", {
           description: error.message || "Tente novamente.",
-          variant: "destructive",
         });
       } else {
-        toast({
-          title: "Senha redefinida com sucesso",
+        toast.success("Senha redefinida com sucesso", {
           description: "Agora você pode fazer login com a nova senha.",
         });
 
         router.push("/login");
       }
     } catch (err) {
-      toast({
-        title: "Erro inesperado",
+      toast.error("Erro inesperado", {
         description: "Tente novamente mais tarde.",
-        variant: "destructive",
       });
     } finally {
       setIsPending(false);

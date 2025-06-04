@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -32,7 +32,6 @@ export function ForgotForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [isPending, setIsPending] = useState(false);
-  const { toast } = useToast();
 
   const form = useForm<ForgotFormValues>({
     resolver: zodResolver(forgotSchema),
@@ -51,22 +50,17 @@ export function ForgotForm({
       });
 
       if (error) {
-        toast({
-          title: "Erro ao solicitar recuperação",
+        toast.error("Erro ao solicitar recuperação", {
           description: error.message || "Não foi possível enviar o e-mail.",
-          variant: "destructive",
         });
       } else {
-        toast({
-          title: "E-mail enviado",
+        toast.success("E-mail enviado", {
           description: "Verifique sua caixa de entrada para redefinir a senha.",
         });
       }
     } catch {
-      toast({
-        title: "Erro inesperado",
+      toast.error("Erro inesperado", {
         description: "Tente novamente mais tarde.",
-        variant: "destructive",
       });
     } finally {
       setIsPending(false);
