@@ -8,7 +8,7 @@ import nodemailer from "nodemailer";
 export const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "localhost",
   port: parseInt(process.env.SMTP_PORT || "1025", 10),
-  secure: process.env.NODE_ENV === "production", // SSL só em produção
+  secure: process.env.SMTP_SECURE === "true", // SSL só em produção
   auth: process.env.SMTP_HOST
     ? {
         user: process.env.SMTP_USER,
