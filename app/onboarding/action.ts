@@ -1,11 +1,12 @@
 "use server";
 import { prisma } from "@/lib/prisma";
-import { OnboardingFormData } from "./onboarding-provider";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-export async function finishOnboard(OnboardingFormData: OnboardingFormData) {
+export async function finishOnboard(OnboardingFormData: {
+  [key: string]: string;
+}) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -18,7 +19,7 @@ export async function finishOnboard(OnboardingFormData: OnboardingFormData) {
     await prisma.onboardingResponse.create({
       data: {
         question: key,
-        answer: OnboardingFormData[key as keyof OnboardingFormData],
+        answer: OnboardingFormData[key],
         inputName: key,
         userId: session.user.id,
       },
