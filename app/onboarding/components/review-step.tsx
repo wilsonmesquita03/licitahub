@@ -18,11 +18,6 @@ export function ReviewStep() {
           value={formData.operationType}
           badge
         />
-        <ReviewItem label="Faturamento Anual" value={formData.annualRevenue} />
-        <ReviewItem
-          label="Número de Funcionários"
-          value={formData.employeesCount}
-        />
         <ReviewItem
           label="Descrição de Produtos/Serviços"
           value={formData.productServiceDescription}

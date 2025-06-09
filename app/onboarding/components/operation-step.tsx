@@ -18,14 +18,21 @@ export function OperationStep() {
     <div className="space-y-4">
       <div>
         <Label>Tipo de Operação</Label>
-        <Select value={formData.operationType}>
+        <Select
+          value={formData.operationType}
+          onValueChange={(value) =>
+            updateFormData({
+              operationType: value as "online" | "presencial" | "hibrido",
+            })
+          }
+        >
           <SelectTrigger>
             <SelectValue placeholder="Selecione o tipo de operação" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="online">Online</SelectItem>
             <SelectItem value="presencial">Presencial</SelectItem>
-            <SelectItem value="hibrido">Híbrido</SelectItem>
+            <SelectItem value="ambos">Ambos</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -22,7 +22,7 @@ export default function OnboardingPage() {
   const { currentStep, steps, nextStep, prevStep, formData } = useOnboarding();
 
   const handleSubmit = async () => {
-    await finishOnboard(formData)
+    await finishOnboard(formData);
   };
 
   // No arquivo page.tsx, atualize o switch case:

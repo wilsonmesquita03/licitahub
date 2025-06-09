@@ -14,6 +14,7 @@ export type OnboardingFormData = {
   operationType: "online" | "presencial" | "hibrido";
   annualRevenue: string;
   employeesCount: string;
+  category: string;
   // Adicione mais campos conforme necessário
 };
 
@@ -44,6 +45,7 @@ export function OnboardingProvider({
     operationType: "online",
     annualRevenue: "",
     employeesCount: "",
+    category: "",
   });
 
   // No arquivo de contexto, atualize os steps:

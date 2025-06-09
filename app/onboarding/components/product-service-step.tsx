@@ -80,7 +80,10 @@ export function ProductServiceStep() {
 
       <div>
         <Label>Categoria Principal</Label>
-        <Select>
+        <Select
+          value={formData.category}
+          onValueChange={(value) => updateFormData({ category: value })}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Selecione a categoria principal" />
           </SelectTrigger>
@@ -92,15 +95,6 @@ export function ProductServiceStep() {
             ))}
           </SelectContent>
         </Select>
-      </div>
-
-      <div>
-        <Label htmlFor="yearsInOperation">Anos no Mercado</Label>
-        <Input
-          type="number"
-          id="yearsInOperation"
-          placeholder="Quantos anos sua empresa está ativa?"
-        />
       </div>
     </div>
   );
