@@ -1,12 +1,10 @@
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { Chat } from "@/components/chat/chat";
-import type { Attachment, UIMessage } from "ai";
+import type { UIMessage } from "ai";
 import { prisma } from "@/lib/prisma";
-import { DataStreamHandler } from "@/components/chat/data-stream-handler";
-import { DEFAULT_CHAT_MODEL } from "@/lib/models";
 import { auth } from "@/lib/auth";
 import { Message } from "@/prisma/generated/prisma";
+import Chat from "@/components/chat/beta/chat";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -25,14 +23,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     redirect("/login");
   }
 
-  if (chat.visibility === "private") {
-    if (!session.user) {
-      return notFound();
-    }
-
-    if (session.user.id !== chat.userId) {
-      return notFound();
-    }
+  if (session.user.id !== chat.userId) {
+    return notFound();
   }
 
   const messagesFromDb = await prisma.message.findMany({
@@ -49,29 +41,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       // Note: content will soon be deprecated in @ai-sdk/react
       content: "",
       createdAt: message.createdAt,
-      experimental_attachments:
-        (message.attachments as unknown as Array<Attachment>) ?? [],
+      experimental_attachments: Array.isArray(message.attachments)
+        ? message.attachments
+        : JSON.parse(message.attachments as string) ?? [],
     }));
-  }
-
-  const cookieStore = await cookies();
-  const chatModelFromCookie = cookieStore.get("chat-model");
-
-  if (!chatModelFromCookie) {
-    return (
-      <>
-        <Chat
-          id={chat.id}
-          initialMessages={convertToUIMessages(messagesFromDb)}
-          initialChatModel={DEFAULT_CHAT_MODEL}
-          initialVisibilityType={chat.visibility}
-          isReadonly={session?.user?.id !== chat.userId}
-          session={session}
-          autoResume={true}
-        />
-        <DataStreamHandler id={id} />
-      </>
-    );
   }
 
   return (
@@ -79,13 +52,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       <Chat
         id={chat.id}
         initialMessages={convertToUIMessages(messagesFromDb)}
-        initialChatModel={chatModelFromCookie.value}
-        initialVisibilityType={chat.visibility}
-        isReadonly={session?.user?.id !== chat.userId}
-        session={session}
-        autoResume={true}
+        session={session.session}
+        isReadonly={false}
       />
-      <DataStreamHandler id={id} />
     </>
   );
 }

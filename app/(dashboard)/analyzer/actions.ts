@@ -15,7 +15,7 @@ export async function saveChatModelAsCookie(model: string) {
 export async function generateTitleFromUserMessage({
   message,
 }: {
-  message: UIMessage;
+  message: string;
 }) {
   const { text: title } = await generateText({
     model: myProvider.languageModel("title-model"),

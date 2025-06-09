@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "./generated/prisma"
@@ -188,6 +187,7 @@ model Chat {
   id         String     @id @default(uuid())
   createdAt  DateTime
   title      String
+  threadId   String?
   userId     String
   visibility Visibility @default(private)
 
