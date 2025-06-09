@@ -2,7 +2,7 @@
 
 import { generateTitleFromUserMessage } from "@/app/(dashboard)/analyzer/actions";
 import type { Attachment } from "@/app/(dashboard)/analyzer/page";
-import { systemPrompt } from "@/lib/ai/prompts";
+import { getRequestPromptFromHints, systemPrompt } from "@/lib/ai/prompts";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AssistantResponse } from "ai";
@@ -85,11 +85,8 @@ export async function POST(req: Request) {
     async ({ forwardStream, sendDataMessage }) => {
       // Run the assistant on the thread
       const runStream = openai.beta.threads.runs.stream(threadId, {
-        assistant_id: "asst_tT4E2GmuOfxg3aZL12uE780T",
-        additional_instructions: systemPrompt({
-          selectedChatModel: "regular",
-          userContext,
-        }),
+        assistant_id: process.env.ASSISTANT_ID,
+        additional_instructions: getRequestPromptFromHints(userContext),
       });
 
       // forward run status would stream message deltas
