@@ -43,6 +43,10 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  if (sessionCookie && pathname === "/") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
   // Usuário está logado, libera acesso
   return NextResponse.next();
 }
