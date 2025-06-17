@@ -5,9 +5,7 @@ import { MultimodalInput } from "@/components/chat/beta/multimodal-input";
 import { useAssistant } from "@ai-sdk/react";
 import { UIMessage } from "ai";
 import { Session } from "better-auth";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 
 export interface Attachment {
   object: string;

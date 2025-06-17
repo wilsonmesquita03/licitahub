@@ -1,8 +1,6 @@
-// @ts-nocheck
-
 import { generateTitleFromUserMessage } from "@/app/(dashboard)/analyzer/actions";
 import type { Attachment } from "@/app/(dashboard)/analyzer/page";
-import { getRequestPromptFromHints, systemPrompt } from "@/lib/ai/prompts";
+import { getRequestPromptFromHints } from "@/lib/ai/prompts";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AssistantResponse } from "ai";
@@ -18,7 +16,6 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const input: {
     id: string;
-    threadId: string | null;
     message: string;
     attachments: Array<Attachment>;
   } = await req.json();
@@ -31,30 +28,17 @@ export async function POST(req: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const threadId = input.threadId ?? (await openai.beta.threads.create({})).id;
-
-  const createdMessage = await openai.beta.threads.messages.create(threadId, {
-    role: "user",
-    content: input.message,
-    attachments: input.attachments.map((attachment) => ({
-      file_id: attachment.id,
-      tools: [
-        {
-          type: "file_search",
-        },
-      ],
-    })),
-  });
-
   let chat = await prisma.chat.findFirst({
     where: { id: input.id },
   });
 
   if (!chat) {
+    const threadId = (await openai.beta.threads.create({})).id;
+
     chat = await prisma.chat.create({
       data: {
         id: input.id,
-        threadId: input.threadId,
+        threadId: threadId,
         title: await generateTitleFromUserMessage({ message: input.message }),
         visibility: "public",
         createdAt: new Date(),
@@ -63,11 +47,27 @@ export async function POST(req: Request) {
     });
   }
 
-  await prisma.message.create({
+  const createdMessage = await openai.beta.threads.messages.create(
+    chat?.threadId as string,
+    {
+      role: "user",
+      content: input.message,
+      attachments: input.attachments.map((attachment) => ({
+        file_id: attachment.id,
+        tools: [
+          {
+            type: "file_search",
+          },
+        ],
+      })),
+    }
+  );
+
+  const message = await prisma.message.create({
     data: {
+      id: createdMessage.id,
       attachments: JSON.stringify(input.attachments),
       parts: [{ type: "text", text: input.message }],
-      id: createdMessage.id,
       createdAt: new Date(),
       role: "user",
       chatId: chat.id,
@@ -80,24 +80,30 @@ export async function POST(req: Request) {
     },
   });
 
-  return AssistantResponse(
-    { threadId, messageId: createdMessage.id },
+  const response = AssistantResponse(
+    { threadId: chat?.threadId as string, messageId: message.id },
     async ({ forwardStream, sendDataMessage }) => {
       // Run the assistant on the thread
-      const runStream = openai.beta.threads.runs.stream(threadId, {
-        assistant_id: process.env.ASSISTANT_ID,
-        additional_instructions: getRequestPromptFromHints(userContext),
-      });
+      const runStream = openai.beta.threads.runs.stream(
+        chat?.threadId as string,
+        {
+          assistant_id: process.env.ASSISTANT_ID || "",
+          additional_instructions: getRequestPromptFromHints(userContext),
+        }
+      );
 
       // forward run status would stream message deltas
       let runResult = await forwardStream(runStream);
 
       // status can be: queued, in_progress, requires_action, cancelling, cancelled, failed, completed, or expired
       if (runResult?.status === "completed") {
-        const messages = await openai.beta.threads.messages.list(threadId, {
-          run_id: runResult.id,
-          limit: 1,
-        });
+        const messages = await openai.beta.threads.messages.list(
+          chat?.threadId as string,
+          {
+            run_id: runResult.id,
+            limit: 1,
+          }
+        );
 
         const message = messages.data[0];
 
@@ -109,12 +115,12 @@ export async function POST(req: Request) {
                 .filter((content) => content.type === "text")
                 .map((content) => ({
                   type: content.type,
-                  text: content.text?.value,
+                  text: (content as { text: { value: string } }).text.value,
                 })),
               id: message.id,
               createdAt: new Date(message.created_at),
               role: "assistant",
-              chatId: chat.id,
+              chatId: chat?.id as string,
             },
           });
       }
@@ -141,7 +147,7 @@ export async function POST(req: Request) {
 
         runResult = await forwardStream(
           openai.beta.threads.runs.submitToolOutputsStream(
-            threadId,
+            chat?.threadId as string,
             runResult.id,
             { tool_outputs }
           )
@@ -149,4 +155,6 @@ export async function POST(req: Request) {
       }
     }
   );
+
+  return response;
 }

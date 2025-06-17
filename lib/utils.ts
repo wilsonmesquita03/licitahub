@@ -262,3 +262,16 @@ export function generateProposalDoc(data: ProposalData): TDocumentDefinitions {
     },
   };
 }
+
+export const formatToBRL = (value: number) => {
+  const number = value;
+  return number.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
+export const parseBRLToFloat = (value: string) => {
+  const clean = value.replace(/[^\d]/g, "");
+  return parseFloat(clean) / 100 || 0;
+};

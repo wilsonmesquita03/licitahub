@@ -53,7 +53,7 @@ export function PreviewMessage({ message }: MessageLayoutProps) {
                   {message.experimental_attachments.map((attachment) => (
                     <div
                       key={attachment?.id}
-                      className="flex gap-2 p-4 rounded-full"
+                      className="flex gap-2 rounded-full"
                     >
                       <div className="w-8 h-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
                         <Image
@@ -95,7 +95,7 @@ export function PreviewMessage({ message }: MessageLayoutProps) {
               if (type === "text") {
                 if (mode === "view") {
                   return (
-                    <div key={key} className="flex flex-row gap-2 items-start">
+                    <div key={key} className="flex flex-row justify-end">
                       {/* message.role === "user" && !isReadonly && (
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -116,7 +116,7 @@ export function PreviewMessage({ message }: MessageLayoutProps) {
 
                       <div
                         data-testid="message-content"
-                        className={cn("flex flex-col gap-4", {
+                        className={cn("flex flex-col gap-4 w-fit", {
                           "bg-primary text-primary-foreground px-3 py-2 rounded-xl":
                             message.role === "user",
                         })}
