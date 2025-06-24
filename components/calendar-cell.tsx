@@ -98,12 +98,19 @@ export function CalendarCell({
                       await createBoletim(slot.start, slot.end);
                     } catch (error) {
                       if (error instanceof Error)
-                        toast.error(error.message, {
-                          action: {
-                            label: "Definir agora",
-                            onClick: () => router.push("/settings"),
-                          },
-                        });
+                        if (
+                          error.message ===
+                          "Você deve definir suas palavras chaves primeiro"
+                        )
+                          toast.error(
+                            "Você deve definir suas palavras chaves primeiro",
+                            {
+                              action: {
+                                label: "Definir agora",
+                                onClick: () => router.push("/settings"),
+                              },
+                            }
+                          );
                     }
                   }}
                   className="text-left w-full text-xs rounded-md p-1 transition-colors bg-green-600 hover:bg-green-700"

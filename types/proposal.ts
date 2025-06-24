@@ -32,7 +32,7 @@ type LegalRepresentative = {
 };
 
 export type ProposalData = {
-  letterhead?: string; // para (EM TIMBRADO), se quiser colocar algo customizado
+  letterhead?: File | FileList | string; // 1️⃣ aceitar todos os formatos
   biddingNumber: string; // ex: "PREGÃO ELETRÔNICO Nº 22/2025"
   company: CompanyData;
   representative: LegalRepresentative;

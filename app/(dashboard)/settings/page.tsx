@@ -26,10 +26,22 @@ export default async function SettingsPage() {
     },
   });
 
+  const keywords = await prisma.userKeyword.findFirst({
+    where: {
+      userId: session.user.id,
+      default: true,
+    },
+  });
+
   return (
     <div className="container p-8 mx-auto space-y-4">
-      <Onboarding responses={responses} />
-      <Keywords />
+      <div className="grid grid-cols-2">
+        <Onboarding responses={responses} />
+        <Keywords
+          id={keywords?.id || null}
+          keywords={keywords?.keyword || []}
+        />
+      </div>
     </div>
   );
 }

@@ -40,7 +40,7 @@ export const Onboarding = ({
 
   const [originalValuesState, setOriginalValuesState] = useState(defaultValues);
 
-  const { register, handleSubmit, watch } = useForm({
+  const { register, handleSubmit } = useForm({
     defaultValues,
   });
 

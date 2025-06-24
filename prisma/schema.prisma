@@ -387,7 +387,8 @@ model SentBoletim {
 model UserKeyword {
   id        String   @id @default(uuid())
   name      String?
-  keyword   String
+  keyword   String[]
+  default   Boolean  @default(false)
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())

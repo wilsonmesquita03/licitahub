@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { notFound, unauthorized } from "next/navigation";
 import { BackBtn } from "./back-btn";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function Page({
   params,
@@ -47,7 +49,9 @@ export default async function Page({
   return (
     <div className="max-w-6xl mx-auto px-8 py-4 pt-14 h-full">
       <div className="my-4">
-        <BackBtn />
+        <Link href="/boletim">
+          <Button variant="outline">Voltar</Button>
+        </Link>
       </div>
 
       <div className="mb-4">
@@ -69,7 +73,7 @@ export default async function Page({
 
       <p className="text-muted-foreground my-4">
         {(tenders as []).length < 50
-          ? `${(tenders as []).length} Encontradas`
+          ? `${(tenders as []).length} Licitações encontradas`
           : `Aproximadamente ${
               (tenders as [])?.length * totalPages
             } licitações encontradas`}
@@ -79,7 +83,7 @@ export default async function Page({
 
       <PaginationControls
         currentPage={page}
-        totalPages={totalPages}
+        totalPages={totalPages || 1}
         limit={limit}
       />
     </div>

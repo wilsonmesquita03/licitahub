@@ -18,11 +18,11 @@ export async function createBoletim(rangeStart: Date, rangeEnd: Date) {
 
   if (boletimAlreadyExists) return;
 
-  const keywords = await prisma.userKeyword.findMany({
-    where: { userId: session.user.id },
+  const keywords = await prisma.userKeyword.findFirst({
+    where: { userId: session.user.id, default: true },
   });
 
-  if (keywords.length === 0) {
+  if (!keywords) {
     throw new Error("Você deve definir suas palavras chaves primeiro");
   }
 
@@ -32,7 +32,7 @@ export async function createBoletim(rangeStart: Date, rangeEnd: Date) {
       rangeEnd,
       rangeStart,
       createdAt: new Date(),
-      keywords: [],
+      keywords: keywords.keyword,
       userId: session.user.id,
     },
   });

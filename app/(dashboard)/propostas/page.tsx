@@ -50,7 +50,6 @@ export default function PropostasPage() {
     formState: { errors },
   } = useForm<ProposalData>({
     defaultValues: {
-      letterhead: "ACME Soluções Técnicas LTDA",
       biddingNumber: "PREGÃO ELETRÔNICO Nº 22/2025",
       company: {
         companyName: "ACME Soluções Técnicas LTDA",
@@ -101,13 +100,12 @@ export default function PropostasPage() {
     name: "items",
   });
 
+
   const onSubmit = async (data: ProposalData) => {
     setIsGenerating(true);
     try {
-      const proposalDoc = generateProposalDoc(data);
-
+      const proposalDoc = await generateProposalDoc(data);
       const pdfDocGenerator = pdfMake.createPdf(proposalDoc);
-
       // @ts-ignore
       // @ts-nocheck
       setPdfUrl(await pdfDocGenerator.getDataUrl());
@@ -124,7 +122,7 @@ export default function PropostasPage() {
   };
 
   return (
-    <div className="container py-8 mx-auto">
+    <div className="container p-8 mx-auto">
       <div className="mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Montador de Propostas</h1>
@@ -152,7 +150,7 @@ export default function PropostasPage() {
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="letterhead">Timbrado (opcional)</Label>
-                      <Textarea id="letterhead" {...register("letterhead")} />
+                      <Input type="file" {...register("letterhead")} />
                     </div>
                     <div>
                       <Label htmlFor="biddingNumber">Número do Pregão</Label>

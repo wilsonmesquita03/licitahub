@@ -14,36 +14,38 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { Loader2, Plus } from "lucide-react";
+import { toast } from "sonner";
+import { updateKeywords } from "./actions";
 
-export default function Keywords() {
-  const [keywords, setKeywords] = useState<string[]>([]);
+interface IKeywordsProps {
+  id: string | null;
+  keywords: string[];
+}
+
+export default function Keywords({ id, keywords }: IKeywordsProps) {
+  const [keywordsState, setKeywordsState] = useState<string[]>(keywords);
   const [newKeyword, setNewKeyword] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const handleAddKeyword = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newKeyword.trim();
-    if (trimmed && !keywords.includes(trimmed)) {
-      setKeywords((prev) => [...prev, trimmed]);
+    if (trimmed && !keywordsState.includes(trimmed)) {
+      setKeywordsState((prev) => [...prev, trimmed]);
       setNewKeyword("");
     }
   };
 
   const removeKeyword = (index: number) => {
-    setKeywords((prev) => prev.filter((_, i) => i !== index));
+    setKeywordsState((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSaveKeywords = async () => {
     setIsSaving(true);
     try {
-      await fetch("/api/user/keywords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keywords }),
-      });
+      await updateKeywords(id, keywordsState);
     } catch (err) {
-      console.error("Erro ao salvar palavras-chave:", err);
+      toast.error("Erro ao salvar palavras-chave.");
     } finally {
       setIsSaving(false);
     }
@@ -60,51 +62,42 @@ export default function Keywords() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {isLoading ? (
-          <div className="flex justify-center py-4">
-            <Loader2 className="animate-spin h-5 w-5 text-muted-foreground" />
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap gap-2">
-              {keywords.map((keyword, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="flex items-center"
+        <>
+          <div className="flex flex-wrap gap-2">
+            {keywordsState?.map((keyword, index) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="flex items-center"
+              >
+                {keyword}
+                <button
+                  className="ml-1"
+                  onClick={() => removeKeyword(index)}
+                  aria-label="Remover"
                 >
-                  {keyword}
-                  <button
-                    className="ml-1"
-                    onClick={() => removeKeyword(index)}
-                    aria-label="Remover"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
 
-            <form
-              onSubmit={handleAddKeyword}
-              className="flex items-center gap-2"
-            >
-              <Input
-                value={newKeyword}
-                onChange={(e) => setNewKeyword(e.target.value)}
-                placeholder="Nova palavra-chave"
-              />
-              <Button type="submit" variant="secondary">
-                <Plus className="w-4 h-4 mr-1" />
-                Adicionar
-              </Button>
-            </form>
-          </>
-        )}
+          <form onSubmit={handleAddKeyword} className="flex items-center gap-2">
+            <Input
+              value={newKeyword}
+              onChange={(e) => setNewKeyword(e.target.value)}
+              placeholder="Nova palavra-chave"
+            />
+            <Button type="submit" variant="secondary">
+              <Plus className="w-4 h-4 mr-1" />
+              Adicionar
+            </Button>
+          </form>
+        </>
       </CardContent>
 
       <CardFooter>
-        <Button onClick={handleSaveKeywords} disabled={isSaving || isLoading}>
+        <Button onClick={handleSaveKeywords} disabled={isSaving}>
           {isSaving && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
           Salvar palavras-chave
         </Button>

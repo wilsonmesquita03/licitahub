@@ -125,7 +125,24 @@ export function sanitizeText(text: string) {
   return text.replace("<has_function_call>", "");
 }
 
-export function generateProposalDoc(data: ProposalData): TDocumentDefinitions {
+export function fileToDataURL(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (!(file instanceof Blob)) {
+      return reject(
+        new TypeError("Esperava receber Blob ou File, mas veio outro tipo")
+      );
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file); // agora é seguro
+  });
+}
+
+export async function generateProposalDoc(
+  data: ProposalData
+): Promise<TDocumentDefinitions> {
   const {
     letterhead,
     biddingNumber,
@@ -155,13 +172,30 @@ export function generateProposalDoc(data: ProposalData): TDocumentDefinitions {
     ]),
   ];
 
+  let letterheadSrc: string | undefined;
+
+  if (letterhead) {
+    if (typeof letterhead === "string") {
+      // Já é Data URL
+      letterheadSrc = letterhead;
+    } else if (letterhead instanceof FileList) {
+      // Primeiro arquivo do <input type="file">
+      if (letterhead.length) {
+        letterheadSrc = await fileToDataURL(letterhead[0]);
+      }
+    } else if (letterhead instanceof Blob) {
+      // Único arquivo já isolado
+      letterheadSrc = await fileToDataURL(letterhead);
+    }
+  }
+
   return {
     content: [
       {
-        text: letterhead || "(EM TIMBRADO)",
-        style: "header",
+        image: letterheadSrc ?? "(EM TIMBRADO)",
+        fit: [150, 75], // ou width: 515, se preferir
         alignment: "center",
-        margin: [0, 0, 0, 10],
+        margin: [0, 0, 0, 10], // 10 pt abaixo costuma bastar
       },
       {
         text: "PROPOSTA DE PREÇO",

@@ -44,3 +44,36 @@ export async function updateResponses(data: { [key: string]: string }) {
 
   return modified;
 }
+
+export async function updateKeywords(id: string | null, keywords: string[]) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return unauthorized();
+  }
+
+  if (id) {
+    await prisma.userKeyword.update({
+      where: {
+        id,
+      },
+      data: {
+        keyword: keywords,
+      },
+    });
+
+    return { ok: true };
+  }
+
+  await prisma.userKeyword.create({
+    data: {
+      userId: session.user.id,
+      keyword: keywords,
+      default: true,
+    },
+  });
+
+  return { ok: true };
+}
