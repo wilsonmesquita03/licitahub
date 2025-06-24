@@ -1,12 +1,11 @@
 "use client";
 import {
-  ChevronUp,
   FileSearch,
   FileText,
   LayoutDashboard,
   Loader2,
+  Newspaper,
   Search,
-  User2,
 } from "lucide-react";
 
 import {
@@ -50,6 +49,11 @@ const items = [
     title: "Montador de Propostas",
     url: "/propostas",
     icon: FileText,
+  },
+  {
+    title: "Boletim de Licitações",
+    url: "/boletim",
+    icon: Newspaper,
   },
 ];
 

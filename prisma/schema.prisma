@@ -34,6 +34,8 @@ model User {
   image              String?
   sessions           Session[]
   accounts           Account[]
+  SentBoletim        SentBoletim[]
+  UserKeyword        UserKeyword[]
 
   @@map("user")
 }
@@ -367,4 +369,28 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model SentBoletim {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  color      String
+  keywords   String[]
+  rangeStart DateTime
+  rangeEnd   DateTime
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, rangeStart])
+}
+
+model UserKeyword {
+  id        String   @id @default(uuid())
+  name      String?
+  keyword   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([keyword])
 }

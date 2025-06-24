@@ -21,22 +21,6 @@ export default function Keywords() {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchKeywords = async () => {
-      try {
-        const res = await fetch("/api/user/keywords");
-        const data = await res.json();
-        setKeywords(data || []);
-      } catch (err) {
-        console.error("Erro ao carregar palavras-chave:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchKeywords();
-  }, []);
-
   const handleAddKeyword = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newKeyword.trim();

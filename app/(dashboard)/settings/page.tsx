@@ -1,9 +1,8 @@
-import { EditResponseDialog } from "@/components/edit-onboarding";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import Keywords from "./keywords";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { Onboarding } from "./onboarding";
 
 export default async function SettingsPage() {
   const session = await auth.api.getSession({
@@ -28,41 +27,8 @@ export default async function SettingsPage() {
   });
 
   return (
-    <div className="container p-8 mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">
-            Minhas Respostas do Onboarding
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            {responses.map((response) => (
-              <Card key={response.id}>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    {response.question}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <p className="text-sm">
-                    <span className="font-medium text-muted-foreground">
-                      Resposta:
-                    </span>{" "}
-                    {response.answer}
-                  </p>
-                  <EditResponseDialog
-                    id={response.id}
-                    initialAnswer={response.answer}
-                    question={response.question}
-                  />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+    <div className="container p-8 mx-auto space-y-4">
+      <Onboarding responses={responses} />
       <Keywords />
     </div>
   );

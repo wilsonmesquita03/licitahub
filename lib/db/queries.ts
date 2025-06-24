@@ -533,14 +533,19 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
   }
 }
 
-export async function getTenders(searchParams?: {
-  page?: string;
-  limit?: string;
-  uf?: string;
-  q?: string; // termo de busca no purchaseObject
-  disputeModeName?: string;
-  modalityName?: string;
-}) {
+export async function getTenders(
+  searchParams?: {
+    page?: string;
+    limit?: string;
+    uf?: string;
+    q?: string; // termo de busca no purchaseObject
+    disputeModeName?: string;
+    modalityName?: string;
+  },
+  rangeStart?: Date,
+  rangeEnd?: Date,
+  keywords?: string[]
+) {
   const page = Number(searchParams?.page || 1);
   const limit = Number(searchParams?.limit || 50);
   const q = searchParams?.q?.trim();
@@ -557,6 +562,17 @@ export async function getTenders(searchParams?: {
 
     if (q) {
       where.purchaseObject = { contains: q, mode: "insensitive" };
+    }
+    if (rangeStart && rangeEnd) {
+      where.publicationDatePncp = {
+        gte: rangeStart,
+        lte: rangeEnd,
+      };
+    }
+    if (keywords) {
+      where.purchaseObject = {
+        contains: keywords.join(" "),
+      };
     }
     if (uf) {
       where.unidadeOrgao = {
@@ -610,6 +626,17 @@ export async function getTenders(searchParams?: {
       filters.push(`modalityName=eq.${params.modalityName}`);
     }
 
+    if (rangeEnd && rangeStart) {
+      filters.push(
+        `publicationDatePncp=lt.${rangeEnd.toISOString()}`,
+        `publicationDatePncp=lt.${rangeEnd.toISOString()}`
+      );
+      filters.push(
+        `proposalClosingDate=gt.${rangeStart.toISOString()}`,
+        `proposalClosingDate=gt.${rangeStart.toISOString()}`
+      );
+    }
+
     const queryBuilder = supabase
       .from("Tender")
       .select(
@@ -621,6 +648,16 @@ export async function getTenders(searchParams?: {
         { count: "exact" }
       )
       .range(offset, offset + limit - 1);
+
+    const keywordsQuery = keywords;
+
+    if (keywordsQuery && keywordsQuery.length > 0) {
+      const orQuery = keywordsQuery.join(" or ");
+      queryBuilder.textSearch("purchaseObject", orQuery, {
+        type: "websearch",
+        config: "portuguese",
+      });
+    }
 
     // Full-text search apenas no campo purchaseObject
     const textSearchQuery = params?.q
