@@ -35,7 +35,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="container p-8 mx-auto space-y-4">
-      <div className="grid grid-cols-2">
+      <div className="flex flex-col gap-4">
         <Onboarding responses={responses} />
         <Keywords
           id={keywords?.id || null}

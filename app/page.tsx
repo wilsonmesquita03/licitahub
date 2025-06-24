@@ -1,11 +1,21 @@
-"use client";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-export default function HomePage() {
-  const { data: session } = authClient.useSession();
+export default async function HomePage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const opportunities = await prisma.tender.count({
+    where: {
+      proposalClosingDate: {
+        gte: new Date(),
+      },
+    },
+  });
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4 py-16 text-center bg-background">
@@ -46,6 +56,9 @@ export default function HomePage() {
             </>
           )}
         </div>
+        <p className="left-1/2 -translate-x-1/2 absolute bottom-4 text-xs text-muted-foreground">
+          {opportunities} Oportunidades esperando por você
+        </p>
       </section>
     </main>
   );

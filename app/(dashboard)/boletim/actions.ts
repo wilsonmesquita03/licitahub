@@ -23,7 +23,7 @@ export async function createBoletim(rangeStart: Date, rangeEnd: Date) {
   });
 
   if (!keywords) {
-    throw new Error("Você deve definir suas palavras chaves primeiro");
+    return { message: "Você deve definir suas palavras chaves primeiro" };
   }
 
   const boletim = await prisma.sentBoletim.create({

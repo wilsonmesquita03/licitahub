@@ -83,6 +83,7 @@
     "framer-motion": "^12.10.4",
     "google-auth-library": "^9.15.1",
     "handlebars": "^4.7.8",
+    "inngest": "^3.39.2",
     "input-otp": "^1.2.4",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.446.0",

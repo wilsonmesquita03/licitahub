@@ -94,24 +94,14 @@ export function CalendarCell({
                 <Button
                   key={i}
                   onClick={async () => {
-                    try {
-                      await createBoletim(slot.start, slot.end);
-                    } catch (error) {
-                      if (error instanceof Error)
-                        if (
-                          error.message ===
-                          "Você deve definir suas palavras chaves primeiro"
-                        )
-                          toast.error(
-                            "Você deve definir suas palavras chaves primeiro",
-                            {
-                              action: {
-                                label: "Definir agora",
-                                onClick: () => router.push("/settings"),
-                              },
-                            }
-                          );
-                    }
+                    const res = await createBoletim(slot.start, slot.end);
+                    if (res?.message)
+                      toast.error(res.message, {
+                        action: {
+                          label: "Definir agora",
+                          onClick: () => router.push("/settings"),
+                        },
+                      });
                   }}
                   className="text-left w-full text-xs rounded-md p-1 transition-colors bg-green-600 hover:bg-green-700"
                 >

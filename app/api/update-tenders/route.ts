@@ -1,7 +1,7 @@
 import { updateTender } from "@/lib/db/queries";
 import { prisma } from "@/lib/prisma";
-import { capitalizarTexto } from "@/lib/utils";
-import axios, { AxiosError } from "axios";
+import { proccessCompra } from "@/lib/utils/server";
+import axios from "axios";
 import { parse } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -109,10 +109,8 @@ export async function GET(request: NextRequest) {
       console.log(
         `>> Iniciando fetch - Modalidade ${codigoModalidadeContratacao}, Página ${pagina}`
       );
-      console.time("Tempo total página");
 
       try {
-        console.time("Fetch API externa");
         const { data: tendersResponse } = await axios.get<ResponseData>(
           "https://pncp.gov.br/api/consulta/v1/contratacoes/atualizacao",
           {
@@ -125,7 +123,6 @@ export async function GET(request: NextRequest) {
             },
           }
         );
-        console.timeEnd("Fetch API externa");
 
         if (tendersResponse.empty) {
           console.log("✔️ Nenhuma compra encontrada na pagina");
@@ -158,53 +155,54 @@ export async function GET(request: NextRequest) {
           existingTenders.map((t) => t.pncpControlNumber)
         );
 
-        if (existingPncpSet.size === 0) {
-          console.log("✔️ Nenhuma compra encontrada na pagina");
-          break;
-        }
-
-        await Promise.allSettled(
-          tenders
-            .filter((tender) => existingPncpSet.has(tender.numeroControlePNCP))
-            .map((tender) =>
-              updateTender(
-                {
-                  pncpControlNumber: tender.numeroControlePNCP,
-                },
-                {
-                  purchaseNumber: tender.numeroCompra,
-                  process: tender.processo,
-                  purchaseYear: tender.anoCompra,
-                  purchaseSequence: tender.sequencialCompra,
-                  modalityId: tender.modalidadeId,
-                  modalityName: tender.modalidadeNome,
-                  instrumentTypeName: tender.tipoInstrumentoConvocatorioNome,
-                  purchaseStatusId: tender.situacaoCompraId,
-                  purchaseStatusName: tender.situacaoCompraNome,
-                  purchaseObject: tender.objetoCompra,
-                  estimatedTotalValue: tender.valorTotalEstimado,
-                  approvedTotalValue: tender.valorTotalHomologado,
-                  inclusionDate: new Date(tender.dataInclusao),
-                  publicationDatePncp: new Date(tender.dataPublicacaoPncp),
-                  updateDate: new Date(tender.dataAtualizacao),
-                  proposalOpeningDate: tender.dataAberturaProposta
-                    ? new Date(tender.dataAberturaProposta)
-                    : null,
-                  proposalClosingDate: tender.dataEncerramentoProposta
-                    ? new Date(tender.dataEncerramentoProposta)
-                    : null,
-                  pncpControlNumber: tender.numeroControlePNCP,
-                  globalUpdateDate: new Date(tender.dataAtualizacaoGlobal),
-                  disputeModeId: tender.modoDisputaId,
-                  disputeModeName: tender.modoDisputaNome,
-                  srp: tender.srp,
-                  userName: tender.usuarioNome,
-                  sourceSystemLink: tender.linkSistemaOrigem,
-                  electronicProcessLink: tender.linkProcessoEletronico,
-                }
-              )
-            )
+        const tendersToUpdate = tenders.filter((tender) =>
+          existingPncpSet.has(tender.numeroControlePNCP)
         );
+
+        const tendersToCreate = tenders.filter(
+          (tender) => !existingPncpSet.has(tender.numeroControlePNCP)
+        );
+
+        await Promise.allSettled([
+          ...tendersToUpdate.map((tender) =>
+            updateTender(
+              { pncpControlNumber: tender.numeroControlePNCP },
+              {
+                purchaseNumber: tender.numeroCompra,
+                process: tender.processo,
+                purchaseYear: tender.anoCompra,
+                purchaseSequence: tender.sequencialCompra,
+                modalityId: tender.modalidadeId,
+                modalityName: tender.modalidadeNome,
+                instrumentTypeName: tender.tipoInstrumentoConvocatorioNome,
+                purchaseStatusId: tender.situacaoCompraId,
+                purchaseStatusName: tender.situacaoCompraNome,
+                purchaseObject: tender.objetoCompra,
+                estimatedTotalValue: tender.valorTotalEstimado,
+                approvedTotalValue: tender.valorTotalHomologado,
+                inclusionDate: new Date(tender.dataInclusao),
+                publicationDatePncp: new Date(tender.dataPublicacaoPncp),
+                updateDate: new Date(tender.dataAtualizacao),
+                proposalOpeningDate: tender.dataAberturaProposta
+                  ? new Date(tender.dataAberturaProposta)
+                  : null,
+                proposalClosingDate: tender.dataEncerramentoProposta
+                  ? new Date(tender.dataEncerramentoProposta)
+                  : null,
+                pncpControlNumber: tender.numeroControlePNCP,
+                globalUpdateDate: new Date(tender.dataAtualizacaoGlobal),
+                disputeModeId: tender.modoDisputaId,
+                disputeModeName: tender.modoDisputaNome,
+                srp: tender.srp,
+                userName: tender.usuarioNome,
+                sourceSystemLink: tender.linkSistemaOrigem,
+                electronicProcessLink: tender.linkProcessoEletronico,
+              }
+            )
+          ),
+        ]);
+
+        await proccessCompra(tendersToCreate);
 
         totalPaginas = tendersResponse.totalPaginas;
 
@@ -234,7 +232,6 @@ export async function GET(request: NextRequest) {
         }
 
         pagina++;
-        console.timeEnd("Tempo total página");
       } catch (error) {
         console.error(
           `❌ Erro na página ${pagina} da modalidade ${codigoModalidadeContratacao}:`,
