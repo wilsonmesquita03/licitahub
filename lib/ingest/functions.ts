@@ -54,63 +54,7 @@ export const syncPncp = inngest.createFunction(
 
           const tenders = tendersResponse.data;
 
-          const pncpNumbers = tenders.map((t) => t.numeroControlePNCP);
-          const existingTenders = await prisma.tender.findMany({
-            where: { pncpControlNumber: { in: pncpNumbers } },
-            select: { pncpControlNumber: true },
-          });
-
-          const existingPncpSet = new Set(
-            existingTenders.map((t) => t.pncpControlNumber)
-          );
-
-          const tendersToUpdate = tenders.filter((tender) =>
-            existingPncpSet.has(tender.numeroControlePNCP)
-          );
-          const tendersToCreate = tenders.filter(
-            (tender) => !existingPncpSet.has(tender.numeroControlePNCP)
-          );
-
-          await Promise.allSettled([
-            ...tendersToUpdate.map((tender) =>
-              updateTender(
-                { pncpControlNumber: tender.numeroControlePNCP },
-                {
-                  purchaseNumber: tender.numeroCompra,
-                  process: tender.processo,
-                  purchaseYear: tender.anoCompra,
-                  purchaseSequence: tender.sequencialCompra,
-                  modalityId: tender.modalidadeId,
-                  modalityName: tender.modalidadeNome,
-                  instrumentTypeName: tender.tipoInstrumentoConvocatorioNome,
-                  purchaseStatusId: tender.situacaoCompraId,
-                  purchaseStatusName: tender.situacaoCompraNome,
-                  purchaseObject: tender.objetoCompra,
-                  estimatedTotalValue: tender.valorTotalEstimado,
-                  approvedTotalValue: tender.valorTotalHomologado,
-                  inclusionDate: new Date(tender.dataInclusao),
-                  publicationDatePncp: new Date(tender.dataPublicacaoPncp),
-                  updateDate: new Date(tender.dataAtualizacao),
-                  proposalOpeningDate: tender.dataAberturaProposta
-                    ? new Date(tender.dataAberturaProposta)
-                    : null,
-                  proposalClosingDate: tender.dataEncerramentoProposta
-                    ? new Date(tender.dataEncerramentoProposta)
-                    : null,
-                  pncpControlNumber: tender.numeroControlePNCP,
-                  globalUpdateDate: new Date(tender.dataAtualizacaoGlobal),
-                  disputeModeId: tender.modoDisputaId,
-                  disputeModeName: tender.modoDisputaNome,
-                  srp: tender.srp,
-                  userName: tender.usuarioNome,
-                  sourceSystemLink: tender.linkSistemaOrigem,
-                  electronicProcessLink: tender.linkProcessoEletronico,
-                }
-              )
-            ),
-          ]);
-
-          await proccessCompra(tendersToCreate);
+          await proccessCompra(tenders);
 
           totalPaginas = tendersResponse.totalPaginas;
 

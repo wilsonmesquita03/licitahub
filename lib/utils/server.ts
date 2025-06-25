@@ -52,6 +52,7 @@ import { cookies } from "next/headers";
 import { Compra } from "@/types/pncp";
 import { prisma } from "../prisma";
 import { capitalizarTexto } from "../utils";
+import { updateTender } from "../db/queries";
 
 export async function createClient(cookieStore: ReturnType<typeof cookies>) {
   return createServerClient(
@@ -90,11 +91,38 @@ export function isValidRedirect(path: string | null): boolean {
 }
 
 export async function proccessCompra(compras: Compra[]) {
+  const tendersToUpdate = await prisma.tender.findMany({
+    where: {
+      pncpControlNumber: { in: compras.map((t) => t.numeroControlePNCP) },
+    },
+    select: { pncpControlNumber: true },
+  });
+
+  await Promise.allSettled(
+    tendersToUpdate.map((tender) =>
+      updateTender(
+        { pncpControlNumber: tender.pncpControlNumber },
+        mapCompraToTender(
+          compras.find(
+            (t) => t.numeroControlePNCP === tender.pncpControlNumber
+          )!
+        )
+      )
+    )
+  );
+
+  const tendersToCreate = compras.filter(
+    (tender) =>
+      !tendersToUpdate.find(
+        (t) => t.pncpControlNumber === tender.numeroControlePNCP
+      )
+  );
+
   const unidades = new Map<string, any>();
   const orgaos = new Map<string, any>();
   const amparos = new Map<number, any>();
 
-  for (const tender of compras) {
+  for (const tender of tendersToCreate) {
     if (!tender?.numeroControlePNCP) continue;
     if (tender.unidadeOrgao) {
       unidades.set(tender.unidadeOrgao.codigoUnidade, tender.unidadeOrgao);
