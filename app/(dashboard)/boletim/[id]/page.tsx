@@ -71,11 +71,9 @@ export default async function Page({
       </div>
 
       <p className="text-muted-foreground my-4">
-        {(tenders as []).length < 50
+        {(tenders as []).length < 50 && totalPages === 1
           ? `${(tenders as []).length} Licitações encontradas`
-          : `Aproximadamente ${
-              (tenders as [])?.length * totalPages
-            } licitações encontradas`}
+          : `Aproximadamente ${totalPages * limit} licitações encontradas`}
       </p>
       {/* @ts-expect-error Server Component */}
       <TenderList tenders={tenders} />
