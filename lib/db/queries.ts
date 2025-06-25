@@ -544,7 +544,6 @@ export async function getTenders(
   },
   rangeStart?: Date,
   rangeEnd?: Date,
-  keywords?: string[]
 ) {
   const page = Number(searchParams?.page || 1);
   const limit = Number(searchParams?.limit || 50);
@@ -567,11 +566,6 @@ export async function getTenders(
       where.publicationDatePncp = {
         gte: rangeStart,
         lte: rangeEnd,
-      };
-    }
-    if (keywords) {
-      where.purchaseObject = {
-        contains: keywords.join(" "),
       };
     }
     if (uf) {
@@ -648,16 +642,6 @@ export async function getTenders(
         { count: "exact" }
       )
       .range(offset, offset + limit - 1);
-
-    const keywordsQuery = keywords;
-
-    if (keywordsQuery && keywordsQuery.length > 0) {
-      const orQuery = keywordsQuery.join(" or ");
-      queryBuilder.textSearch("purchaseObject", orQuery, {
-        type: "websearch",
-        config: "portuguese",
-      });
-    }
 
     // Full-text search apenas no campo purchaseObject
     const textSearchQuery = params?.q

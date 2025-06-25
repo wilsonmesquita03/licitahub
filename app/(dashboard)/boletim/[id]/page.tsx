@@ -40,10 +40,9 @@ export default async function Page({
   if (!boletim) return notFound();
 
   const { tenders, page, totalPages, limit } = await getTenders(
-    searchParamsData,
+    { ...searchParamsData, q: boletim.keywords.join(",") },
     boletim.rangeStart,
-    boletim.rangeEnd,
-    boletim.keywords
+    boletim.rangeEnd
   );
 
   return (

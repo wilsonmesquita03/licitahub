@@ -11,9 +11,16 @@ export default async function HomePage() {
 
   const opportunities = await prisma.tender.count({
     where: {
-      proposalClosingDate: {
-        gte: new Date(),
-      },
+      OR: [
+        {
+          proposalClosingDate: {
+            gte: new Date(),
+          },
+        },
+        {
+          proposalClosingDate: null,
+        },
+      ],
     },
   });
 
