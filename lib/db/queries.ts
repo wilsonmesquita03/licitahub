@@ -543,7 +543,7 @@ export async function getTenders(
     modalityName?: string;
   },
   rangeStart?: Date,
-  rangeEnd?: Date,
+  rangeEnd?: Date
 ) {
   const page = Number(searchParams?.page || 1);
   const limit = Number(searchParams?.limit || 50);
@@ -626,8 +626,8 @@ export async function getTenders(
         `publicationDatePncp=lt.${rangeEnd.toISOString()}`
       );
       filters.push(
-        `proposalClosingDate=gt.${rangeStart.toISOString()}`,
-        `proposalClosingDate=gt.${rangeStart.toISOString()}`
+        `publicationDatePncp=gt.${rangeStart.toISOString()}`,
+        `publicationDatePncp=gt.${rangeStart.toISOString()}`
       );
     }
 
