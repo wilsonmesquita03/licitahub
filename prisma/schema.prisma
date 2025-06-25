@@ -36,6 +36,7 @@ model User {
   accounts           Account[]
   SentBoletim        SentBoletim[]
   UserKeyword        UserKeyword[]
+  Subscription       Subscription[]
 
   @@map("user")
 }
@@ -397,14 +398,16 @@ model UserKeyword {
 }
 
 model Plan {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  price       Float
-  currency    String   @default("BRL")
-  description String?
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String         @id @default(uuid())
+  name         String         @unique
+  price        Float
+  currency     String         @default("BRL")
+  description  String?
+  active       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Feature      Feature[]
+  Subscription Subscription[]
 }
 
 model Feature {
