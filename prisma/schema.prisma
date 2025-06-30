@@ -69,14 +69,14 @@ model Tender {
   sourceSystemLink      String?
   electronicProcessLink String?
 
-  orgaoEntidadeId String
-  orgaoEntidade   OrgaoEntidade @relation(fields: [orgaoEntidadeId], references: [id])
+  orgaoEntidadeId String?
+  orgaoEntidade   OrgaoEntidade? @relation(fields: [orgaoEntidadeId], references: [id])
 
-  unidadeOrgaoId String
-  unidadeOrgao   UnidadeOrgao @relation(fields: [unidadeOrgaoId], references: [id])
+  unidadeOrgaoId String?
+  unidadeOrgao   UnidadeOrgao? @relation(fields: [unidadeOrgaoId], references: [id])
 
-  amparoLegalId String
-  amparoLegal   AmparoLegal @relation(fields: [amparoLegalId], references: [id])
+  amparoLegalId String?
+  amparoLegal   AmparoLegal? @relation(fields: [amparoLegalId], references: [id])
 
   costItems CostItem[]
 
