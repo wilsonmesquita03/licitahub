@@ -49,10 +49,13 @@ export const auth = betterAuth({
         },
       });
 
+      const onboardingComplete = await prisma.onboardingResponse.count({}) > 0
+
       return {
         user: {
           ...user,
           followedTenders,
+          onboardingComplete
         },
         session,
       };

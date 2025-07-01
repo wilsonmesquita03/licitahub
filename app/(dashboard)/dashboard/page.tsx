@@ -208,7 +208,7 @@ export default async function Dashboard() {
                     className="flex items-center justify-between"
                   >
                     <span>
-                      {tender.orgaoEntidade.companyName} - {tender.process}
+                      {tender.orgaoEntidade?.companyName} - {tender.process}
                     </span>
                     <Badge variant="destructive">{tender.timeLeft}</Badge>
                   </li>
@@ -263,7 +263,7 @@ export default async function Dashboard() {
                         <div className="flex items-center justify-between gap-4 p-4 border rounded-lg">
                           <div>
                             <h3 className="font-medium">
-                              {opportunity.orgaoEntidade.companyName}
+                              {opportunity.orgaoEntidade?.companyName}
                             </h3>
                             <p className="text-sm text-muted-foreground">
                               {opportunity.purchaseObject}
@@ -332,7 +332,7 @@ export default async function Dashboard() {
                         <div className="flex items-center justify-between gap-4 p-4 border rounded-lg">
                           <div>
                             <h3 className="font-medium">
-                              {opportunity.orgaoEntidade.companyName}
+                              {opportunity.orgaoEntidade?.companyName}
                             </h3>
                             <p className="text-sm text-muted-foreground">
                               {opportunity.purchaseObject}

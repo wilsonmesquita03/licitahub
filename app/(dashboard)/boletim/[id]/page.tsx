@@ -56,7 +56,7 @@ export default async function Page({
       <div className="mb-4">
         <h1 className="text-4xl font-bold">Boletim</h1>
         <p className="text-muted-foreground">Palavras chaves neste boletim:</p>
-        <div className="flex gap-2 my-4">
+        <div className="flex flex-wrap gap-2 my-4">
           {boletim.keywords.map((keyword) => (
             <Badge key={keyword}>{keyword}</Badge>
           ))}

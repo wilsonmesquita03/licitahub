@@ -3,6 +3,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Header } from "@/components/header";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "LicitaHub - Gestão Inteligente de Licitações",
@@ -10,11 +13,23 @@ export const metadata: Metadata = {
     "Plataforma completa para gestão de participação em licitações públicas",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  if (!session.user.onboardingComplete) {
+    redirect("/onboarding");
+  }
+
   return (
     <>
       <Header />

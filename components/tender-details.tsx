@@ -42,8 +42,8 @@ type DocumentoPncp = {
 
 interface TenderDetailsProps {
   tender: Tender & {
-    unidadeOrgao: UnidadeOrgao;
-    orgaoEntidade: OrgaoEntidade;
+    unidadeOrgao: UnidadeOrgao | null;
+    orgaoEntidade: OrgaoEntidade | null;
   };
   files: DocumentoPncp[];
   defaultIsJoined: boolean;
@@ -135,7 +135,7 @@ export function TenderDetails({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">
-            {tender.orgaoEntidade.companyName}
+            {tender.orgaoEntidade?.companyName || "Não definido"}
           </h1>
           <Badge
             className={`${
@@ -205,7 +205,7 @@ export function TenderDetails({
             <div className="flex justify-between">
               <span>Estado</span>
               <span className="font-medium">
-                {tender.unidadeOrgao.stateName}
+                {tender.unidadeOrgao?.stateName || "Não definido"}
               </span>
             </div>
           </div>

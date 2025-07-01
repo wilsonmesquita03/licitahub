@@ -62,7 +62,7 @@ async function getTender(id: string) {
 
   axios
     .get<Compra>(
-      `https://pncp.gov.br/api/consulta/v1/orgaos/${tender?.orgaoEntidade.cnpj}/compras/${tender.purchaseYear}/${tender.purchaseSequence}`
+      `https://pncp.gov.br/api/consulta/v1/orgaos/${tender?.orgaoEntidade?.cnpj}/compras/${tender.purchaseYear}/${tender.purchaseSequence}`
     )
     .then(async (response) => {
       const tender = response.data;
@@ -105,7 +105,7 @@ async function getTender(id: string) {
 
   const { data: fileResponse } = await axios
     .get<DocumentoPncp[]>(
-      `https://pncp.gov.br/pncp-api/v1/orgaos/${tender?.orgaoEntidade.cnpj}/compras/${tender?.purchaseYear}/${tender?.purchaseSequence}/arquivos`
+      `https://pncp.gov.br/pncp-api/v1/orgaos/${tender.orgaoEntidade?.cnpj}/compras/${tender?.purchaseYear}/${tender?.purchaseSequence}/arquivos`
     )
     .catch(() => ({
       data: [],

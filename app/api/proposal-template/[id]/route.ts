@@ -92,8 +92,12 @@ export async function GET(
 
   const files: { fileId: string; fileName: string }[] = [];
 
+  if (!tender) {
+    return NextResponse.json({ error: "Tender not found" }, { status: 404 });
+  }
+
   const fileResponse = await axios.get<DocumentoPncp[]>(
-    `https://pncp.gov.br/pncp-api/v1/orgaos/${tender?.orgaoEntidade.cnpj}/compras/${tender?.purchaseYear}/${tender?.purchaseSequence}/arquivos`
+    `https://pncp.gov.br/pncp-api/v1/orgaos/${tender.orgaoEntidade?.cnpj}/compras/${tender?.purchaseYear}/${tender?.purchaseSequence}/arquivos`
   );
 
   for (const file of fileResponse.data) {
@@ -148,7 +152,7 @@ export async function GET(
     }
   }
 
-  const oldAssistId = "asst_WvmjcNlFA5O0xFjUQ3Cw7Kik"
+  const oldAssistId = "asst_WvmjcNlFA5O0xFjUQ3Cw7Kik";
 
   const response = await openai.beta.threads.createAndRun({
     model: "gpt-4o-mini",

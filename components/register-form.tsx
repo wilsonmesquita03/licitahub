@@ -20,7 +20,7 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import { toast } from "sonner";
 
-const callbackURL = "/dashboard";
+const callbackURL = "/onboarding";
 
 // Schema de validação com Zod
 const registerSchema = z
