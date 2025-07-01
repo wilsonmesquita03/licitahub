@@ -49,13 +49,22 @@ export const auth = betterAuth({
         },
       });
 
-      const onboardingComplete = await prisma.onboardingResponse.count({}) > 0
+      const onboardingComplete =
+        (await prisma.onboardingResponse.count({})) > 0;
+
+      const keywords = await prisma.userKeyword.findFirst({
+        where: {
+          userId: user.id,
+          default: true,
+        },
+      });
 
       return {
         user: {
           ...user,
           followedTenders,
-          onboardingComplete
+          onboardingComplete,
+          keywords: keywords?.keyword,
         },
         session,
       };
