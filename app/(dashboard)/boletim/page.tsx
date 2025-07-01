@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { cache } from "react";
 
-export const getCalendar = cache(async () => {
+const getCalendar = cache(async () => {
   const rows = await prisma.tender.findMany({
     select: { publicationDatePncp: true },
   });
