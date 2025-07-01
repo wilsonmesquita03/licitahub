@@ -63,8 +63,8 @@ export function Calendar({
             onClick={handlePrev}
             disabled={
               availableDates[currentDate.getFullYear()][
-                currentDate.getMonth()
-              ] > 1000
+                currentDate.getMonth() - 1
+              ] < 1000
             }
           >
             ← Anterior

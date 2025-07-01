@@ -5,24 +5,24 @@ import { headers } from "next/headers";
 import { cache } from "react";
 
 const getCalendar = cache(async () => {
-  const rows = await prisma.tender.findMany({
-    select: { publicationDatePncp: true },
-  });
+  const raw = await prisma.$queryRaw<
+    { year: number; month: number; total: bigint }[]
+  >`
+  SELECT
+  EXTRACT(YEAR  FROM "publicationDatePncp") AS year,
+  EXTRACT(MONTH FROM "publicationDatePncp") - 1 AS month, -- deixa 0‑based
+  COUNT(*)                                            AS total
+  FROM "Tender"
+  GROUP BY year, month
+  ORDER BY year, month;
+  `;
 
   type YearMonthCounts = Record<number, Record<number, number>>;
-
+  // Transforma no mesmo shape { [ano]: { [mês]: total } }
   const counts: YearMonthCounts = {};
-
-  // 2. Conta por ano/mês (mês zero‑based: 0 = jan, 11 = dez)
-  for (const { publicationDatePncp } of rows) {
-    if (!publicationDatePncp) continue; // segurança
-    const d = new Date(publicationDatePncp);
-    const year = d.getUTCFullYear(); // ou getFullYear(), se quiser fuso local
-    const month = d.getUTCMonth(); // 0‑11
-
+  for (const { year, month, total } of raw) {
     counts[year] ??= {};
-    counts[year][month] ??= 0;
-    counts[year][month] += 1;
+    counts[year][month] = Number(total); // bigint → number
   }
 
   return counts;
