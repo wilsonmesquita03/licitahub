@@ -22,7 +22,13 @@ export type CalendarEvent = {
   rangeEnd: Date;
   href: string;
 };
-export function Calendar({ events }: { events: CalendarEvent[] }) {
+export function Calendar({
+  events,
+  availableDates,
+}: {
+  events: CalendarEvent[];
+  availableDates: Record<number, Record<number, number>>;
+}) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
@@ -52,7 +58,15 @@ export function Calendar({ events }: { events: CalendarEvent[] }) {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={handlePrev}>
+          <Button
+            variant="secondary"
+            onClick={handlePrev}
+            disabled={
+              availableDates[currentDate.getFullYear()][
+                currentDate.getMonth()
+              ] > 1000
+            }
+          >
             ← Anterior
           </Button>
           <Button variant="secondary" onClick={handleNext}>
@@ -86,6 +100,9 @@ export function Calendar({ events }: { events: CalendarEvent[] }) {
               date={day}
               isCurrentMonth={isSameMonth(day, currentDate)}
               events={dayEvents}
+              hasBoletim={
+                (availableDates[day.getFullYear()][day.getMonth()] || 0) > 1000
+              }
             />
           );
         })}

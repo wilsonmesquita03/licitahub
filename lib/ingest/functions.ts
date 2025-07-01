@@ -3,7 +3,6 @@ import "server-only";
 import { inngest, proccessCompra } from "../utils/server";
 import { prisma } from "../prisma";
 import axios from "axios";
-import { updateTender } from "../db/queries";
 import { PNCPResponse } from "@/types/pncp";
 import { format, parse, subDays } from "date-fns";
 

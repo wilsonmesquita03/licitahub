@@ -64,6 +64,17 @@ export async function updateKeywords(id: string | null, keywords: string[]) {
       },
     });
 
+    await prisma.sentBoletim.updateMany({
+      where: {
+        userId: session.user.id,
+      },
+      data: {
+        keywords: {
+          set: keywords,
+        },
+      },
+    });
+
     return { ok: true };
   }
 

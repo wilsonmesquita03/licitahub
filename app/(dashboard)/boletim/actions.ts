@@ -3,7 +3,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect, unauthorized } from "next/navigation";
 
 export async function createBoletim(rangeStart: Date, rangeEnd: Date) {
   const session = await auth.api.getSession({
@@ -41,9 +41,26 @@ export async function createBoletim(rangeStart: Date, rangeEnd: Date) {
 }
 
 export async function updateKeyowrds(boletimId: string, keywords: string[]) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) unauthorized();
+
   await prisma.sentBoletim.update({
-    where: { id: boletimId },
+    where: { id: boletimId, userId: session.user.id },
     data: { keywords },
+  });
+
+  const defaultKeywords = await prisma.userKeyword.findFirst({
+    where: { userId: session.user.id, default: true },
+  });
+
+  if (!defaultKeywords) notFound();
+
+  await prisma.userKeyword.update({
+    where: { id: defaultKeywords.id },
+    data: { keyword: keywords },
   });
 
   return { ok: true };

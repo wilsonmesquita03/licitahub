@@ -18,10 +18,12 @@ export function CalendarCell({
   date,
   isCurrentMonth,
   events,
+  hasBoletim
 }: {
   date: Date;
   isCurrentMonth: boolean;
   events: CalendarEvent[];
+  hasBoletim: boolean;
 }) {
   const router = useRouter();
   const now = new Date();
@@ -61,7 +63,7 @@ export function CalendarCell({
     );
   }
 
-  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+  const isWeekend = date.getDay() === 0 || date.getDay() === 6 || !hasBoletim;
 
   return (
     <div
